@@ -11,7 +11,8 @@ export async function GET(
       where: { id },
       include: {
         messages: { orderBy: { createdAt: "asc" } },
-        team: true,
+        workspace: true,
+        tasks: true,
       },
     });
     if (!channel) return NextResponse.json({ error: "Channel not found" }, { status: 404 });

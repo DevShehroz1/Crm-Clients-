@@ -12,9 +12,9 @@ export async function POST(
     if (!email?.trim()) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
     }
-    const member = await prisma.teamMember.create({
+    const member = await prisma.member.create({
       data: {
-        teamId: id,
+        workspaceId: id,
         email: email.trim(),
         name: name?.trim() || null,
       },

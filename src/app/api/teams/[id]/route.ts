@@ -7,7 +7,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const team = await prisma.team.findUnique({
+    const workspace = await prisma.workspace.findUnique({
       where: { id },
       include: {
         members: true,
@@ -15,17 +15,20 @@ export async function GET(
         tasks: {
           orderBy: { createdAt: "desc" },
           include: {
+            subtasks: true,
             comments: true,
             voiceNotes: true,
             attachments: true,
+            dependencies: true,
+            blockedBy: true,
           },
         },
       },
     });
-    if (!team) return NextResponse.json({ error: "Team not found" }, { status: 404 });
-    return NextResponse.json(team);
+    if (!workspace) return NextResponse.json({ error: "Workspace not found" }, { status: 404 });
+    return NextResponse.json(workspace);
   } catch (error) {
-    console.error("Get team:", error);
-    return NextResponse.json({ error: "Failed to fetch team" }, { status: 500 });
+    console.error("Get workspace:", error);
+    return NextResponse.json({ error: "Failed to fetch workspace" }, { status: 500 });
   }
 }

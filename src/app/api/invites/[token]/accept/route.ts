@@ -10,39 +10,39 @@ export async function POST(
     const body = await req.json().catch(() => ({}));
     const { name } = body;
 
-    const invite = await prisma.teamInvite.findUnique({
+    const invite = await prisma.workspaceInvite.findUnique({
       where: { token },
-      include: { team: { select: { id: true, name: true } } },
+      include: { workspace: { select: { id: true, name: true } } },
     });
     if (!invite) return NextResponse.json({ error: "Invite not found" }, { status: 404 });
     if (invite.expiresAt < new Date()) {
       return NextResponse.json({ error: "Invite expired" }, { status: 410 });
     }
 
-    const existingMember = await prisma.teamMember.findFirst({
-      where: { teamId: invite.teamId, email: invite.email },
+    const existingMember = await prisma.member.findFirst({
+      where: { workspaceId: invite.workspaceId, email: invite.email },
     });
     if (existingMember) {
-      await prisma.teamInvite.delete({ where: { id: invite.id } }).catch(() => {});
+      await prisma.workspaceInvite.delete({ where: { id: invite.id } }).catch(() => {});
       return NextResponse.json({
-        team: { id: invite.team.id, name: invite.team.name },
+        team: { id: invite.workspace.id, name: invite.workspace.name },
         alreadyMember: true,
       });
     }
 
     await prisma.$transaction([
-      prisma.teamMember.create({
+      prisma.member.create({
         data: {
-          teamId: invite.teamId,
+          workspaceId: invite.workspaceId,
           email: invite.email,
           name: name?.trim() || null,
         },
       }),
-      prisma.teamInvite.delete({ where: { id: invite.id } }),
+      prisma.workspaceInvite.delete({ where: { id: invite.id } }),
     ]);
 
     return NextResponse.json({
-      team: { id: invite.team.id, name: invite.team.name },
+      team: { id: invite.workspace.id, name: invite.workspace.name },
       alreadyMember: false,
     });
   } catch (error) {

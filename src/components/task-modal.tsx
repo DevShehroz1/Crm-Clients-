@@ -96,7 +96,7 @@ export function TaskModal({
           body: JSON.stringify({
             title: title.trim(),
             description: description.trim() || null,
-            teamId,
+            workspaceId: teamId,
             status,
             priority,
             assignee: assignee || null,
@@ -160,8 +160,8 @@ export function TaskModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-xl">
+      <div className="absolute inset-0 bg-black/50 transition-opacity duration-[120ms]" onClick={onClose} />
+      <div className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl border border-[var(--border)] bg-[var(--surface)] shadow-xl motion-modal-scale-in">
         <div className="sticky top-0 flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4">
           <h2 className="text-lg font-semibold text-slate-900">{task ? "Edit Task" : "New Task"}</h2>
           <Button variant="ghost" size="icon" onClick={onClose}>

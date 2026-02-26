@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Loader2, CheckSquare } from "lucide-react";
 import { Card, CardHeader } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -8,18 +9,22 @@ import { cn } from "@/lib/utils";
 const STATUS_STYLES: Record<string, string> = {
   TODO: "bg-slate-100 text-slate-700",
   IN_PROGRESS: "bg-violet-100 text-violet-700",
-  IN_REVIEW: "bg-amber-100 text-amber-700",
+  Blocked: "bg-amber-100 text-amber-700",
+  Done: "bg-emerald-100 text-emerald-700",
   DONE: "bg-emerald-100 text-emerald-700",
 };
 
 type Task = {
   id: string;
+  shortCode?: string | null;
   title: string;
   status: string;
   assignee: string | null;
+  dueDate: string | null;
 };
 
 export default function MyTasksPage() {
+  const router = useRouter();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -37,7 +42,7 @@ export default function MyTasksPage() {
   }, []);
 
   const user = typeof window !== "undefined" ? JSON.parse(localStorage.getItem("flux_user") || "{}") : {};
-  const myTasks = tasks.filter((t) => t.assignee === user.email || !t.assignee);
+  const myTasks = tasks.filter((t) => t.assignee === user.email);
 
   return (
     <div className="p-6">
@@ -54,9 +59,20 @@ export default function MyTasksPage() {
       ) : (
         <div className="space-y-2">
           {myTasks.map((task) => (
-            <Card key={task.id} className="cursor-pointer border-slate-200 transition-colors hover:bg-slate-50">
+            <Card
+              key={task.id}
+              className="cursor-pointer border-slate-200 transition-colors hover:bg-slate-50"
+              onClick={() => router.push(`/app/tasks?task=${task.id}`)}
+            >
               <CardHeader className="flex flex-row items-center justify-between py-3">
-                <p className="font-medium text-slate-900">{task.title}</p>
+                <div>
+                  <p className="font-medium text-slate-900">{task.title}</p>
+                  <p className="text-xs text-slate-500">
+                    {[task.shortCode, task.dueDate && `Due ${new Date(task.dueDate).toLocaleDateString()}`]
+                      .filter(Boolean)
+                      .join(" · ")}
+                  </p>
+                </div>
                 <span
                   className={cn(
                     "rounded-md px-2 py-0.5 text-xs font-medium",

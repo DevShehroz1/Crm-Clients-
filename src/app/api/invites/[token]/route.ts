@@ -7,9 +7,9 @@ export async function GET(
 ) {
   try {
     const { token } = await params;
-    const invite = await prisma.teamInvite.findUnique({
+    const invite = await prisma.workspaceInvite.findUnique({
       where: { token },
-      include: { team: { select: { id: true, name: true } } },
+      include: { workspace: { select: { id: true, name: true } } },
     });
     if (!invite) return NextResponse.json({ error: "Invite not found" }, { status: 404 });
     if (invite.expiresAt < new Date()) {
@@ -17,8 +17,8 @@ export async function GET(
     }
     return NextResponse.json({
       email: invite.email,
-      teamId: invite.team.id,
-      teamName: invite.team.name,
+      teamId: invite.workspace.id,
+      teamName: invite.workspace.name,
     });
   } catch (error) {
     console.error("Get invite:", error);

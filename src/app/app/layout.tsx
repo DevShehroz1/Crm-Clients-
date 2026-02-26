@@ -13,6 +13,7 @@ import {
   Search,
   LayoutList,
   MessageSquare,
+  Settings,
 } from "lucide-react";
 
 function AddChannelButton({ teamId, onAdded }: { teamId?: string; onAdded: () => void }) {
@@ -100,6 +101,7 @@ function AddChannelButton({ teamId, onAdded }: { teamId?: string; onAdded: () =>
   );
 }
 import { cn } from "@/lib/utils";
+import { QuickAdd } from "@/components/quick-add";
 
 export default function WorkspaceLayout({
   children,
@@ -182,6 +184,16 @@ export default function WorkspaceLayout({
             >
               <CheckSquare className="h-4 w-4" />
               All Tasks
+            </Link>
+            <Link
+              href="/app/settings/profile"
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium",
+                pathname.startsWith("/app/settings") ? "bg-violet-50 text-violet-700" : "text-slate-600 hover:bg-slate-100"
+              )}
+            >
+              <Settings className="h-4 w-4" />
+              Settings
             </Link>
           </div>
           <div className="mt-6">
@@ -273,6 +285,12 @@ export default function WorkspaceLayout({
         </header>
         <main className="flex-1 overflow-auto">{children}</main>
       </div>
+      {team?.id && (
+        <QuickAdd
+          workspaceId={team.id}
+          channelId={channels[0]?.id}
+        />
+      )}
     </div>
   );
 }

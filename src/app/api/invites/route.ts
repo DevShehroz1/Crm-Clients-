@@ -15,11 +15,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "teamId and email are required" }, { status: 400 });
     }
 
-    const team = await prisma.team.findUnique({ where: { id: teamId } });
-    if (!team) return NextResponse.json({ error: "Team not found" }, { status: 404 });
+    const workspace = await prisma.workspace.findUnique({ where: { id: teamId } });
+    if (!workspace) return NextResponse.json({ error: "Workspace not found" }, { status: 404 });
 
-    const existingMember = await prisma.teamMember.findFirst({
-      where: { teamId, email: email.trim().toLowerCase() },
+    const existingMember = await prisma.member.findFirst({
+      where: { workspaceId: teamId, email: email.trim().toLowerCase() },
     });
     if (existingMember) {
       return NextResponse.json({ error: "Already a member" }, { status: 400 });
@@ -29,9 +29,9 @@ export async function POST(req: Request) {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7);
 
-    const invite = await prisma.teamInvite.create({
+    const invite = await prisma.workspaceInvite.create({
       data: {
-        teamId,
+        workspaceId: teamId,
         email: email.trim().toLowerCase(),
         token,
         expiresAt,
@@ -41,7 +41,7 @@ export async function POST(req: Request) {
     const joinUrl = `${APP_URL}/join/${token}`;
     const emailResult = await sendInviteEmail({
       to: email.trim(),
-      teamName: team.name,
+      teamName: workspace.name,
       inviterName: inviterName || undefined,
       joinUrl,
     });
@@ -52,6 +52,7 @@ export async function POST(req: Request) {
       expiresAt: invite.expiresAt,
       emailSent: emailResult.ok,
       joinUrl: !emailResult.ok ? joinUrl : undefined,
+      emailError: !emailResult.ok && "error" in emailResult ? emailResult.error : undefined,
     });
   } catch (error) {
     console.error("Create invite:", error);

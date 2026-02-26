@@ -1,4 +1,5 @@
-// Flux CRM - Team-based work management
+// Flux CRM - Asana/ClickUp-style work management
+// Extends existing Team/Channel/Task structure
 
 generator client {
   provider = "prisma-client-js"
@@ -9,86 +10,227 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Team {
-  id         String        @id @default(cuid())
-  name       String
-  createdAt  DateTime      @default(now())
-  members    TeamMember[]
-  channels   Channel[]
-  tasks      Task[]
-  invites    TeamInvite[]
-}
-
-model TeamMember {
-  id       String   @id @default(cuid())
-  email    String
-  name     String?
-  teamId   String
-  team     Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  joinedAt DateTime @default(now())
-}
-
-model TeamInvite {
+// Workspace (maps to existing Team)
+model Workspace {
   id        String   @id @default(cuid())
-  teamId    String
-  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  email     String
-  token     String   @unique
-  expiresAt DateTime
+  name      String
+  slug      String?  @unique
+  logo      String?
   createdAt DateTime @default(now())
+  members   Member[]
+  channels  Channel[]
+  tasks     Task[]
+  invites   WorkspaceInvite[]
+  @@map("Team")
+}
+
+model Member {
+  id          String    @id @default(cuid())
+  workspaceId String    @map("teamId")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  email       String
+  name        String?
+  role        String    @default("MEMBER")
+  status      String    @default("ACTIVE")
+  joinedAt    DateTime  @default(now())
+  @@map("TeamMember")
+}
+
+model WorkspaceInvite {
+  id          String    @id @default(cuid())
+  workspaceId String    @map("teamId")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  email       String
+  token       String    @unique
+  expiresAt   DateTime
+  createdAt   DateTime  @default(now())
+  @@map("TeamInvite")
 }
 
 model Channel {
-  id        String           @id @default(cuid())
-  name      String
-  teamId    String
-  team      Team             @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  createdAt DateTime         @default(now())
-  messages  ChannelMessage[]
+  id          String    @id @default(cuid())
+  workspaceId String    @map("teamId")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  color       String?
+  icon        String?
+  isPrivate   Boolean   @default(false)
+  parentId    String?
+  createdAt   DateTime  @default(now())
+  tasks       Task[]
+  messages    ChannelMessage[]
+  statuses    ChannelStatus[]
+  updates     ChannelUpdate[]
+}
+
+model ChannelStatus {
+  id         String   @id @default(cuid())
+  channelId  String
+  channel    Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  name       String
+  orderIndex Int      @default(0)
 }
 
 model ChannelMessage {
-  id        String   @id @default(cuid())
-  content   String
-  author    String
-  channelId String
-  channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
+  id              String   @id @default(cuid())
+  content         String
+  bodyRichText    Json?
+  author          String
+  authorEmail     String?
+  channelId       String
+  channel         Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  parentMessageId String?
+  createdAt       DateTime @default(now())
+}
+
+model ChannelUpdate {
+  id         String   @id @default(cuid())
+  channelId  String
+  channel    Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  type       String
+  entityType String?
+  entityId   String?
+  body       String
+  actorEmail String?
+  createdAt  DateTime @default(now())
 }
 
 model Task {
-  id           String          @id @default(cuid())
-  title        String
-  description  String?
-  status       String          @default("TODO")
-  priority     String          @default("MEDIUM")
-  dueDate      DateTime?
-  assignee     String?         // email of assignee
-  teamId       String
-  team         Team            @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  comments     TaskComment[]
-  voiceNotes   VoiceNote[]
-  attachments  TaskAttachment[]
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
+  id             String    @id @default(cuid())
+  workspaceId    String    @map("teamId")
+  workspace      Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  channelId      String?
+  channel        Channel?  @relation(fields: [channelId], references: [id], onDelete: SetNull)
+  shortCode      String?
+  title          String
+  description    String?
+  status         String    @default("TODO")
+  priority       String    @default("NORMAL")
+  assignee       String?
+  assigneeId     String?
+  reporterId     String?
+  startDate      DateTime?
+  dueDate        DateTime?
+  dueTime        String?
+  completedAt    DateTime?
+  estimate       Int?
+  timeTracked    Int       @default(0)
+  points         Int?
+  orderIndex     Int       @default(0)
+  boardColumnId  String?
+  customFields   Json?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  subtasks       Subtask[]
+  comments       TaskComment[]
+  voiceNotes     VoiceNote[]
+  attachments    TaskAttachment[]
+  dependencies   TaskDependency[] @relation("DependsOn")
+  blockedBy      TaskDependency[] @relation("BlockedBy")
+  recurrence     TaskRecurrence?
+  watchers       Watcher[]
+}
+
+model Subtask {
+  id         String   @id @default(cuid())
+  taskId     String
+  task       Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  title      String
+  isDone     Boolean  @default(false)
+  assigneeId String?
+  dueDate    DateTime?
+  orderIndex Int      @default(0)
+}
+
+model TaskDependency {
+  id              String @id @default(cuid())
+  taskId          String
+  task            Task   @relation("DependsOn", fields: [taskId], references: [id], onDelete: Cascade)
+  dependsOnTaskId String
+  dependsOnTask   Task   @relation("BlockedBy", fields: [dependsOnTaskId], references: [id], onDelete: Cascade)
+  type            String
 }
 
 model TaskAttachment {
   id       String   @id @default(cuid())
-  url      String
-  fileName String
   taskId   String
   task     Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  type     String   @default("file")
+  url      String
+  fileName String
+  size     Int?
   createdAt DateTime @default(now())
 }
 
 model TaskComment {
+  id              String        @id @default(cuid())
+  taskId          String
+  task            Task          @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  parentCommentId String?
+  parentComment   TaskComment?  @relation("CommentThread", fields: [parentCommentId], references: [id], onDelete: Cascade)
+  replies         TaskComment[] @relation("CommentThread")
+  content         String
+  bodyRichText    Json?
+  author          String
+  authorEmail     String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  mentions        Mention[]
+  reactions       CommentReaction[]
+}
+
+model Mention {
+  id             String      @id @default(cuid())
+  commentId      String
+  comment        TaskComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  mentionedEmail String
+  createdAt      DateTime    @default(now())
+}
+
+model CommentReaction {
+  id        String      @id @default(cuid())
+  commentId String
+  comment   TaskComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  emoji     String
+  author    String
+  createdAt DateTime    @default(now())
+}
+
+model Watcher {
   id        String   @id @default(cuid())
-  content   String
   taskId    String
   task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  author    String
+  memberId  String
   createdAt DateTime @default(now())
+}
+
+model Notification {
+  id          String   @id @default(cuid())
+  workspaceId String
+  recipientEmail String
+  type        String
+  entityType  String
+  entityId    String
+  actorEmail  String?
+  title       String
+  body        String?
+  url         String?
+  isRead      Boolean  @default(false)
+  readAt      DateTime?
+  snoozedUntil DateTime?
+  createdAt   DateTime @default(now())
+}
+
+model NotificationPreference {
+  id              String   @id @default(cuid())
+  workspaceId     String
+  memberEmail     String
+  emailOnMention  Boolean  @default(true)
+  emailOnAssignment Boolean @default(true)
+  emailOnDueSoon  Boolean  @default(true)
+  pushOnMention   Boolean  @default(true)
+  digestFrequency String   @default("off")
 }
 
 model VoiceNote {
@@ -98,4 +240,43 @@ model VoiceNote {
   task     Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
   duration Int      @default(0)
   createdAt DateTime @default(now())
+}
+
+model ActivityLog {
+  id          String   @id @default(cuid())
+  workspaceId String
+  entityType  String
+  entityId    String
+  actionType  String
+  oldValue    Json?
+  newValue    Json?
+  actorId     String?
+  createdAt   DateTime @default(now())
+}
+
+model ChannelTemplate {
+  id          String   @id @default(cuid())
+  workspaceId String
+  name        String
+  description String?
+  channelData Json?
+  tasks       Json?
+}
+
+model TaskTemplate {
+  id          String   @id @default(cuid())
+  workspaceId String
+  channelId   String?
+  name        String
+  taskData    Json?
+}
+
+model TaskRecurrence {
+  id          String   @id @default(cuid())
+  taskId      String   @unique
+  task        Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  rule        String
+  interval    Int      @default(1)
+  onComplete  Boolean  @default(false)
+  lastRunAt   DateTime?
 }

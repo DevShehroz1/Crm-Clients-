@@ -13,7 +13,7 @@ export default function InviteTeamPage() {
   const [emails, setEmails] = useState<string[]>([""]);
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
-  const [manualLinks, setManualLinks] = useState<{ email: string; joinUrl: string }[]>([]);
+  const [manualLinks, setManualLinks] = useState<{ email: string; joinUrl: string; error?: string }[]>([]);
 
   useEffect(() => {
     const team = JSON.parse(localStorage.getItem("flux_team") || "{}");
@@ -48,7 +48,7 @@ export default function InviteTeamPage() {
     setManualLinks([]);
     try {
       const user = JSON.parse(localStorage.getItem("flux_user") || "{}");
-      const links: { email: string; joinUrl: string }[] = [];
+      const links: { email: string; joinUrl: string; error?: string }[] = [];
       for (const email of valid) {
         const res = await fetch("/api/invites", {
           method: "POST",
@@ -65,7 +65,11 @@ export default function InviteTeamPage() {
           throw new Error(data.error || "Failed to invite");
         }
         if (!data.emailSent && data.joinUrl) {
-          links.push({ email: data.email, joinUrl: data.joinUrl });
+          links.push({
+            email: data.email,
+            joinUrl: data.joinUrl,
+            error: data.emailError,
+          });
         }
       }
       setManualLinks(links);
@@ -171,24 +175,39 @@ export default function InviteTeamPage() {
               </p>
               {manualLinks.length > 0 && (
                 <div className="mt-4 space-y-2 rounded-lg border border-amber-200 bg-amber-50 p-3">
-                  {manualLinks.map(({ email, joinUrl }) => (
+                  <p className="text-xs text-amber-800">
+                    Resend requires a verified domain to send to real emails. Add your domain at{" "}
+                    <a
+                      href="https://resend.com/domains"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline"
+                    >
+                      resend.com/domains
+                    </a>{" "}
+                    and set RESEND_FROM_EMAIL to an address at that domain.
+                  </p>
+                  {manualLinks.map(({ email, joinUrl, error }) => (
                     <div
                       key={email}
-                      className="flex items-center gap-2 rounded border border-amber-100 bg-white p-2"
+                      className="rounded border border-amber-100 bg-white p-2"
                     >
-                      <span className="truncate text-sm text-slate-600">{email}</span>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="ml-auto shrink-0"
-                        onClick={() => {
-                          copyLink(joinUrl);
-                        }}
-                      >
-                        <Copy className="h-4 w-4" />
-                        Copy link
-                      </Button>
+                      <div className="flex items-center gap-2">
+                        <span className="truncate text-sm text-slate-600">{email}</span>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="ml-auto shrink-0"
+                          onClick={() => copyLink(joinUrl)}
+                        >
+                          <Copy className="h-4 w-4" />
+                          Copy link
+                        </Button>
+                      </div>
+                      {error && (
+                        <p className="mt-1 text-xs text-amber-700">{error}</p>
+                      )}
                     </div>
                   ))}
                 </div>

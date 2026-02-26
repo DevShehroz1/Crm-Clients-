@@ -1,10 +1,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
-import { Star, MoreHorizontal, Paperclip, Send, Loader2 } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { Star, MoreHorizontal, Paperclip, Send, Loader2, MessageSquare, Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+
+type ChannelUpdate = {
+  id: string;
+  type: string;
+  body: string;
+  entityType: string | null;
+  entityId: string | null;
+  actorEmail: string | null;
+  createdAt: string;
+};
 
 type Channel = {
   id: string;
@@ -14,8 +25,11 @@ type Channel = {
 
 export default function ChannelPage() {
   const params = useParams();
+  const router = useRouter();
   const id = params.slug as string;
   const [channel, setChannel] = useState<Channel | null>(null);
+  const [updates, setUpdates] = useState<ChannelUpdate[]>([]);
+  const [tab, setTab] = useState<"messages" | "updates">("messages");
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
 
@@ -24,6 +38,14 @@ export default function ChannelPage() {
       .then((r) => (r.ok ? r.json() : null))
       .then(setChannel);
   }, [id]);
+
+  useEffect(() => {
+    if (id && tab === "updates") {
+      fetch(`/api/channels/${id}/updates`)
+        .then((r) => (r.ok ? r.json() : []))
+        .then(setUpdates);
+    }
+  }, [id, tab]);
 
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,6 +86,28 @@ export default function ChannelPage() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <h1 className="font-semibold text-slate-900">#{channelName}</h1>
+            <div className="flex rounded-lg border border-slate-200 p-0.5">
+              <button
+                type="button"
+                onClick={() => setTab("messages")}
+                className={cn(
+                  "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium",
+                  tab === "messages" ? "bg-slate-900 text-white" : "text-slate-600 hover:bg-slate-100"
+                )}
+              >
+                <MessageSquare className="h-4 w-4" /> Messages
+              </button>
+              <button
+                type="button"
+                onClick={() => setTab("updates")}
+                className={cn(
+                  "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium",
+                  tab === "updates" ? "bg-slate-900 text-white" : "text-slate-600 hover:bg-slate-100"
+                )}
+              >
+                <Activity className="h-4 w-4" /> Updates
+              </button>
+            </div>
             <button className="rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600">
               <Star className="h-4 w-4" />
             </button>
@@ -74,6 +118,33 @@ export default function ChannelPage() {
         </div>
       </div>
       <div className="flex-1 overflow-y-auto p-6">
+        {tab === "updates" ? (
+          <div className="space-y-3">
+            {updates.length === 0 ? (
+              <div className="rounded-lg border border-dashed border-slate-200 p-8 text-center text-slate-500">
+                <Activity className="mx-auto mb-2 h-10 w-10 text-slate-300" />
+                <p>No updates yet. Status changes and assignments will appear here.</p>
+              </div>
+            ) : (
+              updates.map((u) => (
+                <div
+                  key={u.id}
+                  className={cn(
+                    "rounded-lg border px-4 py-3",
+                    u.entityId && "cursor-pointer hover:bg-slate-50",
+                    "border-slate-100 bg-slate-50/50"
+                  )}
+                  onClick={() => u.entityType === "task" && u.entityId && router.push(`/app/tasks?task=${u.entityId}`)}
+                >
+                  <p className="text-sm text-slate-600">{u.body}</p>
+                  <p className="mt-1 text-xs text-slate-400">
+                    {new Date(u.createdAt).toLocaleString()}
+                  </p>
+                </div>
+              ))
+            )}
+          </div>
+        ) : (
         <div className="space-y-4">
           {channel.messages.length === 0 && (
             <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
@@ -97,7 +168,9 @@ export default function ChannelPage() {
             </div>
           ))}
         </div>
+        )}
       </div>
+      {tab === "messages" && (
       <form onSubmit={sendMessage} className="border-t border-slate-200 bg-white p-4">
         <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-4 py-2">
           <button type="button" className="rounded p-1 text-slate-400 hover:bg-slate-200 hover:text-slate-600">
@@ -114,6 +187,7 @@ export default function ChannelPage() {
           </Button>
         </div>
       </form>
+      )}
     </div>
   );
 }

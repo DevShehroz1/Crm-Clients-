@@ -13,7 +13,7 @@ export async function POST(
       return NextResponse.json({ error: "Name is required" }, { status: 400 });
     }
     const channel = await prisma.channel.create({
-      data: { name: name.trim(), teamId: id },
+      data: { name: name.trim(), workspaceId: id },
     });
     return NextResponse.json(channel);
   } catch (error) {

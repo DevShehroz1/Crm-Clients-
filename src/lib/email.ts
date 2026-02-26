@@ -42,7 +42,8 @@ export async function sendInviteEmail(params: {
 
   if (error) {
     console.error("Resend error:", error);
-    return { ok: false, error };
+    const message = error?.message || (typeof error === "object" ? JSON.stringify(error) : String(error));
+    return { ok: false, error: message };
   }
   return { ok: true, data };
 }

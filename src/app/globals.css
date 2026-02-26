@@ -261,8 +261,9 @@ body {
   font-family: var(--font-geist-sans), system-ui, sans-serif;
 }
 
-/* Focus ring with accent */
+/* ASANA_SelectionFocusRing - focus ring with accent */
 *:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
+  transition: outline-color 120ms;
 }

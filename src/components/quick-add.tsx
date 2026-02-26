@@ -54,10 +54,11 @@ export function QuickAdd({ workspaceId, channelId, onCreated }: QuickAddProps) {
     <>
       <div
         className="fixed inset-0 z-50 bg-black/40 transition-opacity duration-[120ms]"
+        style={{ transitionTimingFunction: "var(--ease-toggle)" }}
         onClick={() => setOpen(false)}
         aria-hidden
       />
-      <div className="fixed left-1/2 top-1/3 z-50 w-full max-w-xl -translate-x-1/2 -translate-y-1/2 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-2xl motion-modal-scale-in">
+      <div className="fixed left-1/2 top-1/3 z-50 w-full max-w-xl -translate-x-1/2 -translate-y-1/2 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-2xl asana-command-palette-drop">
         <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-4">
           <span className="text-slate-400">Create task</span>
           <input

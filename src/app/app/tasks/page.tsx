@@ -96,7 +96,7 @@ function BoardColumn({
               e.dataTransfer.setData("taskId", task.id);
               e.dataTransfer.effectAllowed = "move";
             }}
-            className="cursor-grab border-slate-200 transition-shadow hover:shadow-md active:cursor-grabbing"
+            className="cursor-grab border-[var(--border)] asana-card-hover active:cursor-grabbing"
           >
             <CardContent
               className="flex items-center justify-between py-3"
@@ -274,7 +274,7 @@ function TasksContent() {
           {workspace.tasks.map((task) => (
             <Card
               key={task.id}
-              className="cursor-pointer border-slate-200 transition-colors hover:bg-slate-50"
+              className="cursor-pointer border-[var(--border)] asana-card-hover"
               onClick={() => setDrawerTaskId(task.id)}
             >
               <CardContent className="flex items-center justify-between py-3">

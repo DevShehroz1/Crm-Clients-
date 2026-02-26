@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Plus, X, Mail, Loader2 } from "lucide-react";
+import { Plus, X, Mail, Loader2, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -13,6 +13,7 @@ export default function InviteTeamPage() {
   const [emails, setEmails] = useState<string[]>([""]);
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [manualLinks, setManualLinks] = useState<{ email: string; joinUrl: string }[]>([]);
 
   useEffect(() => {
     const team = JSON.parse(localStorage.getItem("flux_team") || "{}");
@@ -44,8 +45,10 @@ export default function InviteTeamPage() {
     const valid = emails.filter((e) => e.trim().includes("@"));
     if (valid.length === 0) return;
     setSending(true);
+    setManualLinks([]);
     try {
       const user = JSON.parse(localStorage.getItem("flux_user") || "{}");
+      const links: { email: string; joinUrl: string }[] = [];
       for (const email of valid) {
         const res = await fetch("/api/invites", {
           method: "POST",
@@ -56,18 +59,26 @@ export default function InviteTeamPage() {
             inviterName: user.name || undefined,
           }),
         });
+        const data = await res.json().catch(() => ({}));
         if (!res.ok) {
-          const data = await res.json().catch(() => ({}));
           if (data.error === "Already a member") continue;
           throw new Error(data.error || "Failed to invite");
         }
+        if (!data.emailSent && data.joinUrl) {
+          links.push({ email: data.email, joinUrl: data.joinUrl });
+        }
       }
+      setManualLinks(links);
       setSending(false);
       setSent(true);
     } catch (err) {
       console.error(err);
       setSending(false);
     }
+  };
+
+  const copyLink = (url: string) => {
+    navigator.clipboard.writeText(url);
   };
 
   const goToWorkspace = () => router.push("/app");
@@ -142,11 +153,46 @@ export default function InviteTeamPage() {
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600">
                 <Mail className="h-6 w-6" />
               </div>
-              <h1 className="mt-4 text-2xl font-bold text-slate-900">Invitations sent!</h1>
+              <h1 className="mt-4 text-2xl font-bold text-slate-900">
+                {manualLinks.length > 0 ? "Invites created" : "Invitations sent!"}
+              </h1>
               <p className="mt-2 text-slate-600">
-                Your team members will receive an email with a link to join. They can click the
-                link to be added to your workspace.
+                {manualLinks.length > 0 ? (
+                  <>
+                    Emails couldn&apos;t be sent (add RESEND_API_KEY to enable). Copy and share
+                    these links with your team:
+                  </>
+                ) : (
+                  <>
+                    Your team members will receive an email with a link to join. They can click
+                    the link to be added to your workspace.
+                  </>
+                )}
               </p>
+              {manualLinks.length > 0 && (
+                <div className="mt-4 space-y-2 rounded-lg border border-amber-200 bg-amber-50 p-3">
+                  {manualLinks.map(({ email, joinUrl }) => (
+                    <div
+                      key={email}
+                      className="flex items-center gap-2 rounded border border-amber-100 bg-white p-2"
+                    >
+                      <span className="truncate text-sm text-slate-600">{email}</span>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="ml-auto shrink-0"
+                        onClick={() => {
+                          copyLink(joinUrl);
+                        }}
+                      >
+                        <Copy className="h-4 w-4" />
+                        Copy link
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
               <Button className="mt-6 w-full" onClick={goToWorkspace}>
                 Go to workspace
               </Button>

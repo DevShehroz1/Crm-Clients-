@@ -51,7 +51,7 @@ export async function POST(req: Request) {
       email: invite.email,
       expiresAt: invite.expiresAt,
       emailSent: emailResult.ok,
-      joinUrl: emailResult.skipped ? joinUrl : undefined,
+      joinUrl: !emailResult.ok ? joinUrl : undefined,
     });
   } catch (error) {
     console.error("Create invite:", error);

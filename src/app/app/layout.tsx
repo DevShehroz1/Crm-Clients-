@@ -16,27 +16,87 @@ import {
 } from "lucide-react";
 
 function AddChannelButton({ teamId, onAdded }: { teamId?: string; onAdded: () => void }) {
-  const addChannel = () => {
-    if (!teamId) return;
-    const name = prompt("Channel name:");
-    if (!name?.trim()) return;
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const handleCreate = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!teamId || !name.trim()) return;
+    setSaving(true);
     fetch(`/api/teams/${teamId}/channels`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: name.trim() }),
     })
-      .then((r) => r.ok && onAdded())
-      .catch(console.error);
+      .then((r) => {
+        if (r.ok) {
+          setName("");
+          setOpen(false);
+          onAdded();
+        }
+      })
+      .catch(console.error)
+      .finally(() => setSaving(false));
   };
+
   return (
-    <button
-      type="button"
-      onClick={addChannel}
-      className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-700"
-    >
-      <Plus className="h-4 w-4" />
-      Add channel
-    </button>
+    <>
+      <button
+        type="button"
+        onClick={() => teamId && setOpen(true)}
+        disabled={!teamId}
+        className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-50"
+      >
+        <Plus className="h-4 w-4" />
+        Add channel
+      </button>
+      {open && (
+        <>
+          <div
+            className="fixed inset-0 z-50 bg-black/40"
+            onClick={() => !saving && setOpen(false)}
+            aria-hidden
+          />
+          <div className="fixed left-1/2 top-1/2 z-50 w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-xl border border-slate-200 bg-white p-6 shadow-xl">
+            <h3 className="mb-4 text-lg font-semibold text-slate-900">Create channel</h3>
+            <form onSubmit={handleCreate} className="space-y-4">
+              <div>
+                <label htmlFor="channel-name" className="mb-1.5 block text-sm font-medium text-slate-700">
+                  Channel name
+                </label>
+                <input
+                  id="channel-name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="e.g. general, marketing"
+                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500"
+                  autoFocus
+                  disabled={saving}
+                />
+              </div>
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => !saving && setOpen(false)}
+                  className="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={!name.trim() || saving}
+                  className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700 disabled:opacity-50"
+                >
+                  {saving ? "Creating…" : "Create"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </>
+      )}
+    </>
   );
 }
 import { cn } from "@/lib/utils";
@@ -209,12 +269,6 @@ export default function WorkspaceLayout({
           </div>
           <div className="flex items-center gap-2">
             <span className="text-sm text-slate-500">{team?.name}</span>
-            <Link
-              href="/owner"
-              className="rounded-lg px-3 py-1.5 text-sm text-slate-500 hover:bg-slate-100 hover:text-slate-700"
-            >
-              Owner
-            </Link>
           </div>
         </header>
         <main className="flex-1 overflow-auto">{children}</main>

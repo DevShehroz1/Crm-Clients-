@@ -10,12 +10,13 @@ datasource db {
 }
 
 model Team {
-  id        String          @id @default(cuid())
-  name      String
-  createdAt DateTime        @default(now())
-  members   TeamMember[]
-  channels  Channel[]
-  tasks     Task[]
+  id         String        @id @default(cuid())
+  name       String
+  createdAt  DateTime      @default(now())
+  members    TeamMember[]
+  channels   Channel[]
+  tasks      Task[]
+  invites    TeamInvite[]
 }
 
 model TeamMember {
@@ -25,6 +26,16 @@ model TeamMember {
   teamId   String
   team     Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
   joinedAt DateTime @default(now())
+}
+
+model TeamInvite {
+  id        String   @id @default(cuid())
+  teamId    String
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }
 
 model Channel {

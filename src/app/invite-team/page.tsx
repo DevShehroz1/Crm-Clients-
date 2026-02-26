@@ -45,12 +45,22 @@ export default function InviteTeamPage() {
     if (valid.length === 0) return;
     setSending(true);
     try {
+      const user = JSON.parse(localStorage.getItem("flux_user") || "{}");
       for (const email of valid) {
-        await fetch(`/api/teams/${teamId}/members`, {
+        const res = await fetch("/api/invites", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: email.trim() }),
+          body: JSON.stringify({
+            teamId,
+            email: email.trim(),
+            inviterName: user.name || undefined,
+          }),
         });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          if (data.error === "Already a member") continue;
+          throw new Error(data.error || "Failed to invite");
+        }
       }
       setSending(false);
       setSent(true);
@@ -81,7 +91,8 @@ export default function InviteTeamPage() {
               </div>
               <h1 className="mt-4 text-2xl font-bold text-slate-900">Invite your team</h1>
               <p className="mt-2 text-slate-600">
-                Add team members by email. They&apos;ll be added to your workspace.
+                Add team members by email. They&apos;ll receive an invite link to join your
+                workspace.
               </p>
               <form onSubmit={handleInvite} className="mt-6 space-y-3">
                 {emails.map((email, i) => (
@@ -131,9 +142,10 @@ export default function InviteTeamPage() {
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600">
                 <Mail className="h-6 w-6" />
               </div>
-              <h1 className="mt-4 text-2xl font-bold text-slate-900">Members added!</h1>
+              <h1 className="mt-4 text-2xl font-bold text-slate-900">Invitations sent!</h1>
               <p className="mt-2 text-slate-600">
-                Your team members have been added. Go to your workspace to start.
+                Your team members will receive an email with a link to join. They can click the
+                link to be added to your workspace.
               </p>
               <Button className="mt-6 w-full" onClick={goToWorkspace}>
                 Go to workspace

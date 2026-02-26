@@ -21,17 +21,28 @@ model Client {
 }
 
 model Task {
-  id          String   @id @default(cuid())
-  title       String
-  description String?
-  status      String   @default("TODO") // TODO, IN_PROGRESS, IN_REVIEW, DONE
-  priority    String   @default("MEDIUM") // LOW, MEDIUM, HIGH, URGENT
-  clientId    String
-  client      Client         @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  comments    TaskComment[]
-  voiceNotes  VoiceNote[]
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  id           String          @id @default(cuid())
+  title        String
+  description  String?
+  status       String          @default("TODO") // TODO, IN_PROGRESS, IN_REVIEW, DONE
+  priority     String          @default("MEDIUM") // LOW, MEDIUM, HIGH, URGENT
+  dueDate      DateTime?
+  clientId     String
+  client       Client          @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  comments     TaskComment[]
+  voiceNotes   VoiceNote[]
+  attachments  TaskAttachment[]
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+}
+
+model TaskAttachment {
+  id       String   @id @default(cuid())
+  url      String   // base64 or blob URL
+  fileName String
+  taskId   String
+  task     Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
 }
 
 model TaskComment {

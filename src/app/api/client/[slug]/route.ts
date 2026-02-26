@@ -15,6 +15,7 @@ export async function GET(
           include: {
             comments: { orderBy: { createdAt: "asc" } },
             voiceNotes: { orderBy: { createdAt: "desc" } },
+            attachments: { orderBy: { createdAt: "desc" } },
           },
         },
       },

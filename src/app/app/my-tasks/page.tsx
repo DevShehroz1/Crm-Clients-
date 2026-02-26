@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { Loader2, CheckSquare } from "lucide-react";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardHeader } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 const STATUS_STYLES: Record<string, string> = {
@@ -13,69 +12,61 @@ const STATUS_STYLES: Record<string, string> = {
   DONE: "bg-emerald-100 text-emerald-700",
 };
 
-type Client = {
+type Task = {
   id: string;
-  name: string;
-  tasks: { id: string; title: string; status: string; clientId: string }[];
+  title: string;
+  status: string;
+  assignee: string | null;
 };
 
 export default function MyTasksPage() {
-  const [clients, setClients] = useState<Client[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/clients")
-      .then((r) => r.ok ? r.json() : [])
-      .then(setClients)
+    const team = JSON.parse(localStorage.getItem("flux_team") || "{}");
+    if (!team?.id) {
+      setLoading(false);
+      return;
+    }
+    fetch(`/api/teams/${team.id}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((t) => setTasks(t?.tasks ?? []))
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
 
-  const allTasks = clients.flatMap((c) =>
-    c.tasks.map((t) => ({ ...t, clientName: c.name }))
-  );
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
-      </div>
-    );
-  }
+  const user = typeof window !== "undefined" ? JSON.parse(localStorage.getItem("flux_user") || "{}") : {};
+  const myTasks = tasks.filter((t) => t.assignee === user.email || !t.assignee);
 
   return (
     <div className="p-6">
       <h1 className="mb-6 text-xl font-semibold text-slate-900">My Tasks</h1>
-      {allTasks.length === 0 ? (
+      {loading ? (
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+        </div>
+      ) : myTasks.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-200 py-16">
           <CheckSquare className="mb-4 h-14 w-14 text-slate-300" />
-          <p className="text-slate-500">No tasks assigned yet</p>
+          <p className="text-slate-500">No tasks assigned to you</p>
         </div>
       ) : (
         <div className="space-y-2">
-          {allTasks.map((task) => (
-            <Link key={task.id} href={`/manage/${task.clientId}`}>
-              <Card
-                className={cn(
-                  "cursor-pointer border-slate-200 transition-colors hover:bg-slate-50"
-                )}
-              >
-                <CardHeader className="flex flex-row items-center justify-between py-3">
-                  <div>
-                    <p className="font-medium text-slate-900">{task.title}</p>
-                    <p className="text-sm text-slate-500">{task.clientName}</p>
-                  </div>
-                  <span
-                    className={cn(
-                      "rounded-md px-2 py-0.5 text-xs font-medium",
-                      STATUS_STYLES[task.status] ?? STATUS_STYLES.TODO
-                    )}
-                  >
-                    {task.status.replace("_", " ")}
-                  </span>
-                </CardHeader>
-              </Card>
-            </Link>
+          {myTasks.map((task) => (
+            <Card key={task.id} className="cursor-pointer border-slate-200 transition-colors hover:bg-slate-50">
+              <CardHeader className="flex flex-row items-center justify-between py-3">
+                <p className="font-medium text-slate-900">{task.title}</p>
+                <span
+                  className={cn(
+                    "rounded-md px-2 py-0.5 text-xs font-medium",
+                    STATUS_STYLES[task.status] ?? STATUS_STYLES.TODO
+                  )}
+                >
+                  {task.status.replace("_", " ")}
+                </span>
+              </CardHeader>
+            </Card>
           ))}
         </div>
       )}

@@ -9,13 +9,18 @@ import { Input } from "@/components/ui/input";
 
 export default function InviteTeamPage() {
   const router = useRouter();
+  const [teamId, setTeamId] = useState<string | null>(null);
   const [emails, setEmails] = useState<string[]>([""]);
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
 
   useEffect(() => {
-    const user = localStorage.getItem("flux_user");
-    if (!user) router.push("/get-started");
+    const team = JSON.parse(localStorage.getItem("flux_team") || "{}");
+    if (!team?.id) {
+      router.push("/get-started");
+      return;
+    }
+    setTeamId(team.id);
   }, [router]);
 
   const addEmail = () => setEmails((e) => [...e, ""]);
@@ -35,19 +40,29 @@ export default function InviteTeamPage() {
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!teamId) return;
     const valid = emails.filter((e) => e.trim().includes("@"));
     if (valid.length === 0) return;
     setSending(true);
-    // Simulate invite - in production would call API to send emails
-    await new Promise((r) => setTimeout(r, 1500));
-    const team = JSON.parse(localStorage.getItem("flux_team") || "{}");
-    team.invited = valid;
-    localStorage.setItem("flux_team", JSON.stringify(team));
-    setSending(false);
-    setSent(true);
+    try {
+      for (const email of valid) {
+        await fetch(`/api/teams/${teamId}/members`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: email.trim() }),
+        });
+      }
+      setSending(false);
+      setSent(true);
+    } catch (err) {
+      console.error(err);
+      setSending(false);
+    }
   };
 
   const goToWorkspace = () => router.push("/app");
+
+  if (!teamId) return null;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-50 px-6 py-12">
@@ -66,7 +81,7 @@ export default function InviteTeamPage() {
               </div>
               <h1 className="mt-4 text-2xl font-bold text-slate-900">Invite your team</h1>
               <p className="mt-2 text-slate-600">
-                Add team members by email. They&apos;ll receive an invite to join your workspace.
+                Add team members by email. They&apos;ll be added to your workspace.
               </p>
               <form onSubmit={handleInvite} className="mt-6 space-y-3">
                 {emails.map((email, i) => (
@@ -88,12 +103,7 @@ export default function InviteTeamPage() {
                     </Button>
                   </div>
                 ))}
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="w-full gap-2"
-                  onClick={addEmail}
-                >
+                <Button type="button" variant="ghost" className="w-full gap-2" onClick={addEmail}>
                   <Plus className="h-4 w-4" />
                   Add another
                 </Button>
@@ -101,22 +111,29 @@ export default function InviteTeamPage() {
                   {sending ? (
                     <>
                       <Loader2 className="h-5 w-5 animate-spin" />
-                      Sending invites...
+                      Adding members...
                     </>
                   ) : (
-                    "Send invites"
+                    "Add members"
                   )}
                 </Button>
               </form>
+              <Button
+                variant="link"
+                className="mt-4 w-full"
+                onClick={goToWorkspace}
+              >
+                Skip for now, go to workspace
+              </Button>
             </>
           ) : (
             <>
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600">
                 <Mail className="h-6 w-6" />
               </div>
-              <h1 className="mt-4 text-2xl font-bold text-slate-900">Invites sent!</h1>
+              <h1 className="mt-4 text-2xl font-bold text-slate-900">Members added!</h1>
               <p className="mt-2 text-slate-600">
-                Your team members will receive an email. You can go to your workspace now.
+                Your team members have been added. Go to your workspace to start.
               </p>
               <Button className="mt-6 w-full" onClick={goToWorkspace}>
                 Go to workspace

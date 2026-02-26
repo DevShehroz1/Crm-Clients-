@@ -24,6 +24,9 @@ export default function LandingPage() {
             <span className="text-xl font-bold text-slate-900">Flux CRM</span>
           </Link>
           <nav className="hidden items-center gap-8 md:flex">
+            <Link href="/owner" className="text-sm font-medium text-slate-600 hover:text-slate-900">
+              Owner
+            </Link>
             <a href="#features" className="text-sm font-medium text-slate-600 hover:text-slate-900">
               Features
             </a>

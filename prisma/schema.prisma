@@ -1,5 +1,4 @@
-// Prisma schema for CRM
-// PostgreSQL for Vercel (Neon) and local dev
+// Flux CRM - Team-based work management
 
 generator client {
   provider = "prisma-client-js"
@@ -10,25 +9,52 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Client {
-  id        String   @id @default(cuid())
+model Team {
+  id        String          @id @default(cuid())
   name      String
-  email     String?
-  company   String?
-  slug      String   @unique // unique link: /client/[slug]
-  createdAt DateTime @default(now())
+  createdAt DateTime        @default(now())
+  members   TeamMember[]
+  channels  Channel[]
   tasks     Task[]
+}
+
+model TeamMember {
+  id       String   @id @default(cuid())
+  email    String
+  name     String?
+  teamId   String
+  team     Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  joinedAt DateTime @default(now())
+}
+
+model Channel {
+  id        String           @id @default(cuid())
+  name      String
+  teamId    String
+  team      Team             @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  createdAt DateTime         @default(now())
+  messages  ChannelMessage[]
+}
+
+model ChannelMessage {
+  id        String   @id @default(cuid())
+  content   String
+  author    String
+  channelId String
+  channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
 }
 
 model Task {
   id           String          @id @default(cuid())
   title        String
   description  String?
-  status       String          @default("TODO") // TODO, IN_PROGRESS, IN_REVIEW, DONE
-  priority     String          @default("MEDIUM") // LOW, MEDIUM, HIGH, URGENT
+  status       String          @default("TODO")
+  priority     String          @default("MEDIUM")
   dueDate      DateTime?
-  clientId     String
-  client       Client          @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  assignee     String?         // email of assignee
+  teamId       String
+  team         Team            @relation(fields: [teamId], references: [id], onDelete: Cascade)
   comments     TaskComment[]
   voiceNotes   VoiceNote[]
   attachments  TaskAttachment[]
@@ -38,7 +64,7 @@ model Task {
 
 model TaskAttachment {
   id       String   @id @default(cuid())
-  url      String   // base64 or blob URL
+  url      String
   fileName String
   taskId   String
   task     Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
@@ -50,16 +76,15 @@ model TaskComment {
   content   String
   taskId    String
   task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  author    String   // "client" or "you"
+  author    String
   createdAt DateTime @default(now())
 }
 
 model VoiceNote {
   id       String   @id @default(cuid())
-  url      String   // Vercel Blob URL or base64
+  url      String
   taskId   String
   task     Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  duration Int      @default(0) // seconds
+  duration Int      @default(0)
   createdAt DateTime @default(now())
 }
-

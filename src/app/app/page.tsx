@@ -22,10 +22,10 @@ export default function WorkspaceHomePage() {
   return (
     <div className="p-8">
       <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-        Get the most out of your Overview! Add, reorder, and resize cards to customize this page.
-        <Link href="/get-started" className="ml-2 font-medium underline">
-          Get Started
-        </Link>
+        Get the most out of your Overview!{" "}
+        <Link href="/get-started" className="font-medium underline">
+          Create a team
+        </Link> if you haven&apos;t yet.
       </div>
       <div className="mb-6 flex items-center justify-between">
         <div>

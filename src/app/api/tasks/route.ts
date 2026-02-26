@@ -4,10 +4,10 @@ import { prisma } from "@/lib/db";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { title, description, clientId, priority, dueDate } = body;
-    if (!title || !clientId) {
+    const { title, description, teamId, priority, dueDate, assignee } = body;
+    if (!title || !teamId) {
       return NextResponse.json(
-        { error: "Title and clientId are required" },
+        { error: "Title and teamId are required" },
         { status: 400 }
       );
     }
@@ -15,9 +15,10 @@ export async function POST(request: Request) {
       data: {
         title,
         description: description || null,
-        clientId,
+        teamId,
         priority: priority || "MEDIUM",
         dueDate: dueDate ? new Date(dueDate) : null,
+        assignee: assignee || null,
       },
     });
     return NextResponse.json(task);

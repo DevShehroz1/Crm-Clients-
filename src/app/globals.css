@@ -1,81 +1,88 @@
 @import "tailwindcss";
 
-/* ========== DESIGN TOKENS ========== */
+/* ========== ASANA-LIKE DESIGN TOKENS ========== */
 :root {
-  /* Surfaces */
-  --bg: #ffffff;
+  /* Surfaces (8pt grid) */
+  --bg: #f5f6f8;
   --surface: #ffffff;
-  --surface2: #f8fafc;
-  --text-primary: #0f172a;
-  --text-secondary: #64748b;
-  --border: #e2e8f0;
-  --border-subtle: #f1f5f9;
+  --surface2: #fafbfc;
+  --text-primary: #172b4d;
+  --text-secondary: #6b778c;
+  --border: #e6e9ef;
+  --border-subtle: #ebecf0;
 
   /* Accent */
-  --accent: #7c3aed;
-  --accent-hover: #6d28d9;
-  --accent-muted: #ede9fe;
+  --accent: #6554c0;
+  --accent-hover: #5e4dba;
+  --accent-soft: #eae6ff;
+  --accent-muted: #eae6ff;
 
   /* Semantic */
-  --danger: #dc2626;
-  --danger-muted: #fef2f2;
-  --success: #16a34a;
-  --success-muted: #f0fdf4;
-  --warning: #d97706;
-  --warning-muted: #fffbeb;
+  --danger: #de350b;
+  --danger-muted: #ffebe6;
+  --success: #00875a;
+  --success-muted: #e3fcef;
+  --warning: #ff991f;
+  --warning-muted: #fff4e5;
 
-  /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  /* Focus */
+  --focus-ring: var(--accent);
 
-  /* Radius */
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 18px;
+  /* Shadows (soft, Asana-like) */
+  --shadow-sm: 0 1px 2px 0 rgb(9 30 66 / 0.08);
+  --shadow-md: 0 4px 8px -2px rgb(9 30 66 / 0.1), 0 2px 4px -2px rgb(9 30 66 / 0.06);
+  --shadow-lg: 0 8px 16px -4px rgb(9 30 66 / 0.12), 0 4px 8px -2px rgb(9 30 66 / 0.08);
 
-  /* Motion */
+  /* Radius (12–14 Asana-ish) */
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 20px;
+
+  /* Motion (ASANA spec) */
   --motion-fast: 120ms;
   --motion-med: 180ms;
   --motion-slow: 240ms;
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
-  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-exit: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-toggle: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-out: var(--ease-enter);
+  --ease-in: var(--ease-exit);
+  --ease-in-out: var(--ease-toggle);
 
-  /* Legacy compat */
   --background: var(--bg);
   --foreground: var(--text-primary);
   --muted: var(--text-secondary);
 }
 
 .dark {
-  --bg: #0f172a;
-  --surface: #1e293b;
-  --surface2: #334155;
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --border: #334155;
-  --border-subtle: #475569;
+  --bg: #172b4d;
+  --surface: #1e3a5f;
+  --surface2: #253858;
+  --text-primary: #deebff;
+  --text-secondary: #97a0af;
+  --border: #253858;
+  --border-subtle: #344563;
 
-  --accent-muted: #4c1d95;
+  --accent-soft: rgba(101, 84, 192, 0.25);
 
-  --danger-muted: #450a0a;
-  --success-muted: #052e16;
-  --warning-muted: #451a03;
+  --danger-muted: rgba(222, 53, 11, 0.2);
+  --success-muted: rgba(0, 135, 90, 0.2);
+  --warning-muted: rgba(255, 153, 31, 0.2);
 
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.2);
+  --shadow-md: 0 4px 8px -2px rgb(0 0 0 / 0.25);
+  --shadow-lg: 0 8px 16px -4px rgb(0 0 0 / 0.3);
 }
 
-/* Accent overrides (set via inline style or class) */
-[data-accent="blue"] { --accent: #2563eb; --accent-hover: #1d4ed8; --accent-muted: #dbeafe; }
-[data-accent="emerald"] { --accent: #059669; --accent-hover: #047857; --accent-muted: #d1fae5; }
-[data-accent="amber"] { --accent: #d97706; --accent-hover: #b45309; --accent-muted: #fef3c7; }
-[data-accent="rose"] { --accent: #e11d48; --accent-hover: #be123c; --accent-muted: #ffe4e6; }
-[data-accent="indigo"] { --accent: #4f46e5; --accent-hover: #4338ca; --accent-muted: #e0e7ff; }
-[data-accent="teal"] { --accent: #0d9488; --accent-hover: #0f766e; --accent-muted: #ccfbf1; }
+/* Accent presets (accent-muted = alias for accent-soft) */
+[data-accent="violet"] { --accent: #7c3aed; --accent-hover: #6d28d9; --accent-soft: #ede9fe; --accent-muted: #ede9fe; }
+[data-accent="blue"] { --accent: #2563eb; --accent-hover: #1d4ed8; --accent-soft: #dbeafe; --accent-muted: #dbeafe; }
+[data-accent="emerald"] { --accent: #059669; --accent-hover: #047857; --accent-soft: #d1fae5; --accent-muted: #d1fae5; }
+[data-accent="amber"] { --accent: #d97706; --accent-hover: #b45309; --accent-soft: #fef3c7; --accent-muted: #fef3c7; }
+[data-accent="rose"] { --accent: #e11d48; --accent-hover: #be123c; --accent-soft: #ffe4e6; --accent-muted: #ffe4e6; }
+[data-accent="indigo"] { --accent: #4f46e5; --accent-hover: #4338ca; --accent-soft: #e0e7ff; --accent-muted: #e0e7ff; }
+[data-accent="teal"] { --accent: #0d9488; --accent-hover: #0f766e; --accent-soft: #ccfbf1; --accent-muted: #ccfbf1; }
 
 @theme inline {
   --color-background: var(--bg);
@@ -84,147 +91,168 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* ========== MOTION KEYFRAMES ========== */
-@keyframes motion-page-fade-in {
+/* ========== ASANA MOTION KEYFRAMES ========== */
+@keyframes asana-page-crossfade-in {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
-@keyframes motion-drawer-slide-in {
+@keyframes asana-right-pane-slide-in {
   from { opacity: 0; transform: translateX(24px); }
   to { opacity: 1; transform: translateX(0); }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .motion-drawer-slide-in { animation-name: motion-page-fade-in !important; }
-}
-
-@keyframes motion-modal-scale-in {
+@keyframes asana-modal-pop-in {
   from { opacity: 0; transform: scale(0.98); }
   to { opacity: 1; transform: scale(1); }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .motion-modal-scale-in { animation-name: motion-page-fade-in !important; }
-}
-
-@keyframes motion-dropdown-pop {
+@keyframes asana-dropdown-pop-in {
   from { opacity: 0; transform: translateY(-4px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .motion-dropdown-pop { animation-name: motion-page-fade-in !important; }
+@keyframes asana-tooltip-float-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes motion-toast-slide-up {
+@keyframes asana-toast-slide-up-in {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes motion-skeleton-shimmer {
+@keyframes asana-skeleton-shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .motion-skeleton-shimmer { animation: none !important; }
-}
-
-@keyframes motion-badge-pulse {
+@keyframes asana-badge-pulse {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.12); }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .motion-badge-pulse { animation: none !important; }
-}
-
-@keyframes motion-error-shake {
+@keyframes asana-error-shake {
   0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-4px); }
-  75% { transform: translateX(4px); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
 }
+
+@keyframes asana-list-insert-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes asana-command-palette-drop-in {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Reduce motion: replace transforms with opacity-only */
+[data-reduce-motion="true"] .asana-right-pane-slide-in,
+[data-reduce-motion="true"] .asana-dropdown-pop,
+[data-reduce-motion="true"] .asana-tooltip-float,
+[data-reduce-motion="true"] .asana-toast-slide-up,
+[data-reduce-motion="true"] .asana-modal-pop,
+[data-reduce-motion="true"] .asana-command-palette-drop,
+[data-reduce-motion="true"] .asana-list-insert {
+  animation-name: asana-page-crossfade-in !important;
+  animation-duration: 120ms !important;
+}
+
+[data-reduce-motion="true"] .asana-modal-pop { animation-name: asana-page-crossfade-in !important; }
+[data-reduce-motion="true"] .asana-card-hover:hover { transform: none !important; }
+[data-reduce-motion="true"] .asana-button-press:active { transform: none !important; }
+[data-reduce-motion="true"] .asana-skeleton-shimmer { animation: none !important; }
+[data-reduce-motion="true"] .asana-badge-pulse { animation: none !important; }
+[data-reduce-motion="true"] .asana-error-shake { animation: none !important; }
 
 @media (prefers-reduced-motion: reduce) {
-  .motion-error-shake { animation: none !important; }
+  .asana-right-pane-slide-in, .asana-dropdown-pop, .asana-tooltip-float, .asana-toast-slide-up,
+  .asana-modal-pop, .asana-command-palette-drop, .asana-list-insert {
+    animation-name: asana-page-crossfade-in !important;
+    animation-duration: 120ms !important;
+  }
+  .asana-skeleton-shimmer { animation: none !important; }
+  .asana-badge-pulse { animation: none !important; }
+  .asana-error-shake { animation: none !important; }
+  .asana-card-hover:hover { transform: none !important; }
+  .asana-button-press:active { transform: none !important; }
 }
 
-/* ========== MOTION UTILITY CLASSES ========== */
-.motion-page-fade {
-  animation: motion-page-fade-in 240ms var(--ease-out) forwards;
-}
-
-.motion-drawer-slide-in {
-  animation: motion-drawer-slide-in 180ms var(--ease-out) forwards;
-}
-
-.motion-modal-scale-in {
-  animation: motion-modal-scale-in 180ms var(--ease-out) forwards;
-}
-
-.motion-dropdown-pop {
-  animation: motion-dropdown-pop 120ms var(--ease-out) forwards;
-}
-
-.motion-toast-slide-up {
-  animation: motion-toast-slide-up 180ms var(--ease-out) forwards;
-}
-
+/* Legacy / alias classes */
+.motion-page-fade { animation: asana-page-crossfade-in var(--motion-slow) var(--ease-enter) forwards; }
+.motion-drawer-slide-in { animation: asana-right-pane-slide-in var(--motion-med) var(--ease-enter) forwards; }
+.motion-modal-scale-in { animation: asana-modal-pop-in var(--motion-med) var(--ease-enter) forwards; }
+.motion-dropdown-pop { animation: asana-dropdown-pop-in var(--motion-fast) var(--ease-enter) forwards; }
+.motion-toast-slide-up { animation: asana-toast-slide-up-in var(--motion-med) var(--ease-enter) forwards; }
 .motion-skeleton-shimmer {
   background: linear-gradient(90deg, var(--surface2) 25%, var(--border) 50%, var(--surface2) 75%);
   background-size: 200% 100%;
-  animation: motion-skeleton-shimmer 1.2s infinite linear;
+  animation: asana-skeleton-shimmer 1.2s infinite linear;
 }
+.motion-badge-pulse { animation: asana-badge-pulse 1.8s var(--ease-in-out) infinite; }
+.motion-error-shake { animation: asana-error-shake var(--motion-slow) var(--ease-toggle); }
 
-.motion-badge-pulse {
-  animation: motion-badge-pulse 1.6s ease-in-out infinite;
+/* ASANA named classes */
+.asana-page-crossfade { animation: asana-page-crossfade-in var(--motion-slow) var(--ease-enter) forwards; }
+.asana-right-pane-slide-in { animation: asana-right-pane-slide-in var(--motion-med) var(--ease-enter) forwards; }
+.asana-modal-pop { animation: asana-modal-pop-in var(--motion-med) var(--ease-enter) forwards; }
+.asana-dropdown-pop { animation: asana-dropdown-pop-in var(--motion-fast) var(--ease-enter) forwards; }
+.asana-tooltip-float { animation: asana-tooltip-float-in var(--motion-fast) var(--ease-enter) forwards; }
+.asana-toast-slide-up { animation: asana-toast-slide-up-in var(--motion-med) var(--ease-enter) forwards; }
+.asana-skeleton-shimmer {
+  background: linear-gradient(90deg, var(--surface2) 25%, var(--border) 50%, var(--surface2) 75%);
+  background-size: 200% 100%;
+  animation: asana-skeleton-shimmer 1.2s infinite linear;
 }
+.asana-badge-pulse { animation: asana-badge-pulse 1.8s var(--ease-in-out) infinite; }
+.asana-error-shake { animation: asana-error-shake var(--motion-slow) var(--ease-toggle); }
+.asana-list-insert { animation: asana-list-insert-in var(--motion-med) var(--ease-enter) forwards; }
+.asana-command-palette-drop { animation: asana-command-palette-drop-in var(--motion-med) var(--ease-enter) forwards; }
 
-.motion-error-shake {
-  animation: motion-error-shake 240ms var(--ease-in-out);
+@keyframes asana-save-inline {
+  0% { opacity: 0; }
+  16% { opacity: 1; }
+  84% { opacity: 1; }
+  100% { opacity: 0; }
+}
+.save-inline-ping {
+  animation: asana-save-inline 740ms var(--ease-enter) forwards;
 }
 
 /* Transitions */
-.motion-transition-fast {
-  transition-duration: 120ms;
-  transition-timing-function: var(--ease-out);
-}
+.motion-transition-fast { transition-duration: var(--motion-fast); transition-timing-function: var(--ease-enter); }
+.motion-transition-med { transition-duration: var(--motion-med); transition-timing-function: var(--ease-enter); }
+.motion-transition-slow { transition-duration: var(--motion-slow); transition-timing-function: var(--ease-toggle); }
 
-.motion-transition-med {
-  transition-duration: 180ms;
-  transition-timing-function: var(--ease-out);
+/* ASANA_CardHoverLift, ASANA_ButtonPress, ASANA_RowHoverHighlight */
+.asana-card-hover {
+  transition: transform var(--motion-fast) var(--ease-enter), box-shadow var(--motion-fast) var(--ease-enter);
 }
-
-.motion-transition-slow {
-  transition-duration: 240ms;
-  transition-timing-function: var(--ease-in-out);
-}
-
-.motion-card-hover {
-  transition: transform 120ms var(--ease-out), box-shadow 120ms var(--ease-out);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .motion-card-hover { transition: box-shadow 120ms var(--ease-out); }
-}
-
-.motion-card-hover:hover {
+.asana-card-hover:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .motion-card-hover:hover { transform: none; }
+.asana-button-press { transition: transform 100ms var(--ease-toggle); }
+.asana-button-press:active { transform: scale(0.98); }
+
+.asana-row-hover {
+  transition: background-color var(--motion-fast);
+}
+.asana-row-hover:hover {
+  background-color: var(--surface2);
 }
 
-.motion-button-press:active {
-  transform: scale(0.98);
+.motion-card-hover {
+  transition: transform var(--motion-fast) var(--ease-enter), box-shadow var(--motion-fast) var(--ease-enter);
 }
-
-@media (prefers-reduced-motion: reduce) {
-  .motion-button-press:active { transform: none; }
-}
+.motion-card-hover:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.motion-button-press { transition: transform 100ms var(--ease-toggle); }
+.motion-button-press:active { transform: scale(0.98); }
 
 /* ========== BASE ========== */
 body {

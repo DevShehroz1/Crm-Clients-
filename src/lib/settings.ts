@@ -45,6 +45,9 @@ export type ProfileSettings = {
   timezone: string;
   language: string;
   avatarUrl?: string;
+  workingHoursStart: string;
+  workingHoursEnd: string;
+  workingHoursWeekdays: boolean;
 };
 
 export type Settings = {
@@ -56,8 +59,11 @@ export type Settings = {
 const DEFAULT_PROFILE: ProfileSettings = {
   name: "",
   title: "",
-  timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+  timezone: typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : "UTC",
   language: "en",
+  workingHoursStart: "09:00",
+  workingHoursEnd: "17:00",
+  workingHoursWeekdays: true,
 };
 
 const DEFAULT_NOTIFICATIONS: NotificationPrefs = {

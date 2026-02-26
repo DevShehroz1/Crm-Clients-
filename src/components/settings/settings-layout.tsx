@@ -31,8 +31,8 @@ export function SettingsLayout({
   const pathname = usePathname();
 
   return (
-    <div className="flex min-h-full">
-      <aside className="w-56 shrink-0 border-r border-[var(--border)] bg-[var(--surface)] p-4 motion-transition-med">
+    <div className="flex min-h-full asana-page-crossfade">
+      <aside className="w-[280px] shrink-0 border-r border-[var(--border)] bg-[var(--surface)] p-4 motion-transition-med">
         <nav className="space-y-0.5">
           {TABS.map((tab) => {
             const Icon = tab.icon;
@@ -55,7 +55,9 @@ export function SettingsLayout({
           })}
         </nav>
       </aside>
-      <main className="flex-1 p-8 motion-page-fade">{children}</main>
+      <main className="flex-1 p-8">
+        <div className="mx-auto max-w-[900px]">{children}</div>
+      </main>
     </div>
   );
 }

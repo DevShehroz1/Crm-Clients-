@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { X, Loader2, Plus, Check, MessageSquare, Bell, BellOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { CommentComposer } from "@/components/comment-composer";
 import { VoiceNoteRecorder } from "@/components/voice-note-recorder";
+import { useLayout } from "@/lib/layout-context";
 import { cn } from "@/lib/utils";
 
 type Subtask = { id: string; title: string; isDone: boolean; orderIndex: number };
@@ -74,6 +75,19 @@ export function TaskDrawer({
   const [watching, setWatching] = useState(false);
 
   const userEmail = typeof window !== "undefined" ? JSON.parse(localStorage.getItem("flux_user") || "{}")?.email : "";
+  const { rightPaneWidth, startPaneResize } = useLayout();
+
+  const handleClose = useCallback(() => {
+    onClose();
+  }, [onClose]);
+
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") handleClose();
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [handleClose]);
 
   useEffect(() => {
     if (!taskId) return;
@@ -204,7 +218,10 @@ export function TaskDrawer({
 
   if (loading || !task) {
     return (
-      <div className="fixed inset-y-0 right-0 z-50 flex w-full max-w-xl flex-col border-l border-slate-200 bg-white shadow-xl">
+      <div
+        className="fixed inset-y-0 right-0 z-50 flex flex-col border-l border-[var(--border)] bg-[var(--surface)] shadow-xl"
+        style={{ width: rightPaneWidth }}
+      >
         <div className="flex flex-1 items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
         </div>
@@ -215,13 +232,16 @@ export function TaskDrawer({
   return (
     <>
       <div
-        className="fixed inset-0 z-40 bg-black/30 transition-opacity duration-[120ms] ease-[cubic-bezier(0.65,0,0.35,1)]"
-        onClick={onClose}
+        className="fixed inset-0 z-40 bg-black/30 transition-opacity duration-[120ms]"
+        style={{ transitionTimingFunction: "var(--ease-toggle)" }}
+        onClick={handleClose}
         aria-hidden
       />
       <div
-        className="fixed inset-y-0 right-0 z-50 flex w-full max-w-xl flex-col border-l border-[var(--border)] bg-[var(--surface)] shadow-xl motion-drawer-slide-in"
+        className="fixed inset-y-0 right-0 z-50 flex flex-col border-l border-[var(--border)] bg-[var(--surface)] shadow-xl asana-right-pane-slide-in"
+        style={{ width: rightPaneWidth }}
         role="dialog"
+        aria-label="Task details"
       >
           <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
           <div className="flex items-center gap-3">
@@ -247,7 +267,7 @@ export function TaskDrawer({
               {priority}
             </span>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose}>
+          <Button variant="ghost" size="icon" onClick={handleClose} className="asana-button-press">
             <X className="h-5 w-5" />
           </Button>
         </div>
@@ -451,6 +471,12 @@ export function TaskDrawer({
             </div>
           )}
         </div>
+        {/* Resize handle */}
+        <div
+          className="absolute left-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-[var(--accent)]/20"
+          onMouseDown={startPaneResize}
+          aria-hidden
+        />
       </div>
     </>
   );

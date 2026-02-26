@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -32,7 +32,6 @@ type Client = {
 
 export default function ManageClientPage() {
   const params = useParams();
-  const router = useRouter();
   const clientId = params.clientId as string;
   const [client, setClient] = useState<Client | null>(null);
   const [loading, setLoading] = useState(true);
@@ -77,7 +76,7 @@ export default function ManageClientPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-950">
+      <div className="flex min-h-screen items-center justify-center bg-slate-50">
         <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
       </div>
     );
@@ -85,7 +84,7 @@ export default function ManageClientPage() {
 
   if (!client) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-slate-50 dark:bg-slate-950">
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-slate-50">
         <p className="text-slate-500">Client not found</p>
         <Link href="/">
           <Button variant="outline">Back to Dashboard</Button>
@@ -94,21 +93,20 @@ export default function ManageClientPage() {
     );
   }
 
-  const todoCount = client.tasks.filter((t) => t.status === "TODO").length;
   const doneCount = client.tasks.filter((t) => t.status === "DONE").length;
   const total = client.tasks.length;
   const progress = total > 0 ? Math.round((doneCount / total) * 100) : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
-      <header className="border-b border-slate-200/80 bg-white/80 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/80">
-        <div className="mx-auto flex h-16 max-w-3xl items-center justify-between px-6">
-          <Link href="/" className="flex items-center gap-2 text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-50">
+    <div className="min-h-screen bg-slate-50">
+      <header className="border-b border-slate-200 bg-white">
+        <div className="mx-auto flex h-14 max-w-3xl items-center justify-between px-6">
+          <Link href="/" className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900">
             <ArrowLeft className="h-4 w-4" />
             Back
           </Link>
           <div>
-            <h1 className="font-semibold text-slate-900 dark:text-slate-50">
+            <h1 className="font-semibold text-slate-900">
               {client.name}
             </h1>
             {client.company && (
@@ -119,44 +117,44 @@ export default function ManageClientPage() {
             href={`/client/${client.slug}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm text-slate-600 hover:underline dark:text-slate-400"
+            className="text-sm text-slate-600 hover:text-slate-900 hover:underline"
           >
-            View client portal
+            View portal
           </a>
         </div>
       </header>
 
-      <main className="mx-auto max-w-3xl px-6 py-10">
-        <Card className="mb-8 overflow-hidden">
-          <CardHeader className="bg-slate-50 dark:bg-slate-900/50">
-            <CardTitle className="text-base">Progress</CardTitle>
+      <main className="mx-auto max-w-3xl px-6 py-8">
+        <Card className="mb-6 overflow-hidden border-slate-200">
+          <CardHeader className="border-b border-slate-100 bg-white py-4">
+            <CardTitle className="text-sm font-medium text-slate-700">Progress</CardTitle>
             <p className="text-sm text-slate-500">
               {doneCount} of {total} tasks completed
             </p>
-            <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
+            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-200">
               <div
-                className="h-full rounded-full bg-emerald-500 transition-all duration-500"
+                className="h-full rounded-full bg-violet-500 transition-all duration-500"
                 style={{ width: `${progress}%` }}
               />
             </div>
           </CardHeader>
         </Card>
 
-        <h2 className="mb-4 text-lg font-semibold">Tasks</h2>
+        <h2 className="mb-4 text-base font-semibold text-slate-900">Tasks</h2>
 
         {client.tasks.length === 0 ? (
-          <Card className="border-dashed">
+          <Card className="border-dashed border-2 border-slate-200">
             <CardContent className="py-12 text-center text-slate-500">
               No tasks yet. Client can add tasks from their portal.
             </CardContent>
           </Card>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {client.tasks.map((task) => (
-              <Card key={task.id} className="overflow-hidden">
-                <CardHeader className="flex flex-row items-start justify-between gap-4 py-4">
+              <Card key={task.id} className="overflow-hidden border-slate-200">
+                <CardHeader className="flex flex-row items-start justify-between gap-4 py-3">
                   <div className="min-w-0 flex-1">
-                    <CardTitle className="text-base font-medium">
+                    <CardTitle className="text-sm font-medium text-slate-900">
                       {task.title}
                     </CardTitle>
                     {task.description && (
@@ -171,8 +169,8 @@ export default function ManageClientPage() {
                       updateTaskStatus(task.id, e.target.value)
                     }
                     className={cn(
-                      "shrink-0 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium",
-                      "focus:outline-none focus:ring-2 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-900"
+                      "shrink-0 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700",
+                      "focus:outline-none focus:ring-2 focus:ring-violet-200"
                     )}
                   >
                     {(Object.keys(STATUS_LABELS) as (keyof typeof STATUS_LABELS)[]).map((s) => (

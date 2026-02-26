@@ -8,9 +8,6 @@ import {
   MessageSquare,
   Mic,
   Play,
-  CheckCircle2,
-  Circle,
-  Clock,
   ClipboardList,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -28,10 +25,10 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const STATUS_STYLES: Record<string, string> = {
-  TODO: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
-  IN_PROGRESS: "bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300",
-  IN_REVIEW: "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300",
-  DONE: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300",
+  TODO: "bg-slate-100 text-slate-600",
+  IN_PROGRESS: "bg-amber-50 text-amber-700",
+  IN_REVIEW: "bg-blue-50 text-blue-700",
+  DONE: "bg-emerald-50 text-emerald-700",
 };
 
 type Task = {
@@ -110,8 +107,8 @@ export default function ClientPortalPage() {
     }
   };
 
-  const addComment = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const addComment = async (e?: React.FormEvent) => {
+    e?.preventDefault();
     if (!newComment.trim() || !selectedTask) return;
     setSubmitting(true);
     try {
@@ -173,7 +170,7 @@ export default function ClientPortalPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-950">
+      <div className="flex min-h-screen items-center justify-center bg-slate-50">
         <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
       </div>
     );
@@ -181,7 +178,7 @@ export default function ClientPortalPage() {
 
   if (!client) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-slate-50 dark:bg-slate-950">
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-slate-50">
         <p className="text-slate-500">Portal not found</p>
       </div>
     );
@@ -192,40 +189,40 @@ export default function ClientPortalPage() {
   const progress = total > 0 ? Math.round((doneCount / total) * 100) : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
-      <header className="border-b border-slate-200/80 bg-white/80 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/80">
-        <div className="mx-auto flex h-16 max-w-3xl items-center justify-between px-6">
+    <div className="min-h-screen bg-slate-50">
+      <header className="border-b border-slate-200 bg-white">
+        <div className="mx-auto flex h-14 max-w-3xl items-center px-6">
           <div>
-            <h1 className="font-semibold text-slate-900 dark:text-slate-50">
+            <h1 className="text-base font-semibold text-slate-900">
               Task Portal
             </h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-slate-500">
               Assign tasks and track progress
             </p>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-3xl px-6 py-10">
-        <Card className="mb-8 overflow-hidden">
-          <CardHeader className="bg-slate-50 dark:bg-slate-900/50">
-            <CardTitle className="text-base">Progress</CardTitle>
+      <main className="mx-auto max-w-3xl px-6 py-8">
+        <Card className="mb-6 overflow-hidden border-slate-200">
+          <CardHeader className="border-b border-slate-100 bg-white py-4">
+            <CardTitle className="text-sm font-medium text-slate-700">Progress</CardTitle>
             <p className="text-sm text-slate-500">
               {doneCount} of {total} tasks completed
             </p>
-            <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
+            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-200">
               <div
-                className="h-full rounded-full bg-emerald-500 transition-all duration-500"
+                className="h-full rounded-full bg-violet-500 transition-all duration-500"
                 style={{ width: `${progress}%` }}
               />
             </div>
           </CardHeader>
         </Card>
 
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Tasks</h2>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-base font-semibold text-slate-900">Tasks</h2>
           {!showAddTask ? (
-            <Button onClick={() => setShowAddTask(true)} className="gap-2">
+            <Button onClick={() => setShowAddTask(true)} size="sm" className="gap-2">
               <Plus className="h-4 w-4" />
               Add Task
             </Button>
@@ -233,9 +230,9 @@ export default function ClientPortalPage() {
         </div>
 
         {showAddTask && (
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle className="text-base">New Task</CardTitle>
+          <Card className="mb-6 border-slate-200">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium">New Task</CardTitle>
             </CardHeader>
             <CardContent>
               <form onSubmit={createTask} className="space-y-3">
@@ -246,18 +243,19 @@ export default function ClientPortalPage() {
                   required
                 />
                 <Textarea
-                  placeholder="Description"
+                  placeholder="Description (optional)"
                   value={newTaskDesc}
                   onChange={(e) => setNewTaskDesc(e.target.value)}
                   rows={3}
                 />
                 <div className="flex gap-2">
-                  <Button type="submit" disabled={submitting}>
+                  <Button type="submit" size="sm" disabled={submitting}>
                     {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add Task"}
                   </Button>
                   <Button
                     type="button"
                     variant="outline"
+                    size="sm"
                     onClick={() => {
                       setShowAddTask(false);
                       setNewTaskTitle("");
@@ -273,14 +271,15 @@ export default function ClientPortalPage() {
         )}
 
         {client.tasks.length === 0 && !showAddTask ? (
-          <Card className="border-dashed">
+          <Card className="border-dashed border-2 border-slate-200">
             <CardContent className="py-12 text-center">
-              <ClipboardList className="mx-auto mb-4 h-12 w-12 text-slate-300 dark:text-slate-600" />
-              <p className="text-slate-500 dark:text-slate-400">
+              <ClipboardList className="mx-auto mb-4 h-12 w-12 text-slate-300" />
+              <p className="text-slate-500">
                 No tasks yet. Add your first task to get started.
               </p>
               <Button
                 className="mt-4 gap-2"
+                size="sm"
                 onClick={() => setShowAddTask(true)}
               >
                 <Plus className="h-4 w-4" />
@@ -289,23 +288,22 @@ export default function ClientPortalPage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {client.tasks.map((task) => (
               <Card
                 key={task.id}
                 className={cn(
-                  "cursor-pointer transition-all hover:shadow-md",
-                  selectedTask?.id === task.id &&
-                    "ring-2 ring-slate-400 dark:ring-slate-500"
+                  "cursor-pointer border-slate-200 transition-all hover:shadow-sm",
+                  selectedTask?.id === task.id && "ring-2 ring-violet-200"
                 )}
                 onClick={() =>
                   setSelectedTask(selectedTask?.id === task.id ? null : task)
                 }
               >
-                <CardHeader className="py-4">
+                <CardHeader className="py-3">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
-                      <CardTitle className="text-base font-medium">
+                      <CardTitle className="text-sm font-medium text-slate-900">
                         {task.title}
                       </CardTitle>
                       {task.description && (
@@ -316,36 +314,36 @@ export default function ClientPortalPage() {
                     </div>
                     <span
                       className={cn(
-                        "shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium",
+                        "shrink-0 rounded-md px-2 py-0.5 text-xs font-medium",
                         STATUS_STYLES[task.status] ?? STATUS_STYLES.TODO
                       )}
                     >
                       {STATUS_LABELS[task.status] ?? task.status}
                     </span>
                   </div>
-                  <div className="mt-2 flex items-center gap-4 text-sm text-slate-500">
+                  <div className="mt-2 flex items-center gap-4 text-xs text-slate-500">
                     <span className="flex items-center gap-1">
-                      <MessageSquare className="h-4 w-4" />
+                      <MessageSquare className="h-3.5 w-3.5" />
                       {task.comments.length}
                     </span>
                     <span className="flex items-center gap-1">
-                      <Mic className="h-4 w-4" />
+                      <Mic className="h-3.5 w-3.5" />
                       {task.voiceNotes.length}
                     </span>
                   </div>
                 </CardHeader>
 
                 {selectedTask?.id === task.id && (
-                  <CardContent className="border-t border-slate-100 pt-4 dark:border-slate-800">
-                    <h4 className="mb-3 text-sm font-medium">Comments & voice notes</h4>
-                    <div className="mb-4 max-h-48 space-y-2 overflow-y-auto">
+                  <CardContent className="border-t border-slate-100 bg-slate-50/50 pt-4">
+                    <h4 className="mb-3 text-xs font-medium text-slate-600">Comments</h4>
+                    <div className="mb-4 max-h-40 space-y-2 overflow-y-auto">
                       {task.comments.map((c) => (
                         <div
                           key={c.id}
-                          className="rounded-lg bg-slate-50 p-2 text-sm dark:bg-slate-900"
+                          className="rounded-lg bg-white p-2.5 text-sm shadow-sm"
                         >
-                          <p>{c.content}</p>
-                          <p className="mt-1 text-xs text-slate-500">
+                          <p className="text-slate-700">{c.content}</p>
+                          <p className="mt-1 text-xs text-slate-400">
                             {c.author} · {new Date(c.createdAt).toLocaleString()}
                           </p>
                         </div>
@@ -353,37 +351,51 @@ export default function ClientPortalPage() {
                       {task.voiceNotes.map((v) => (
                         <div
                           key={v.id}
-                          className="flex items-center gap-2 rounded-lg bg-slate-50 p-2 dark:bg-slate-900"
+                          className="flex items-center gap-2 rounded-lg bg-white p-2.5 shadow-sm"
                         >
-                          <Play className="h-4 w-4 text-slate-600" />
+                          <Play className="h-4 w-4 shrink-0 text-violet-500" />
                           <audio
                             src={v.url}
                             controls
                             className="h-8 flex-1"
                           />
-                          <span className="text-xs text-slate-500">
+                          <span className="text-xs text-slate-400">
                             {v.duration}s
                           </span>
                         </div>
                       ))}
                     </div>
-                    <form onSubmit={addComment} className="mb-4 flex gap-2">
+
+                    {/* Message + Voice bar - WhatsApp / ClickUp style */}
+                    <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white p-2">
                       <Input
-                        placeholder="Add a message..."
+                        placeholder="Type a message..."
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
-                        className="flex-1"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && !e.shiftKey) {
+                            e.preventDefault();
+                            addComment();
+                          }
+                        }}
+                        className="flex-1 border-0 shadow-none focus-visible:ring-0"
                       />
-                      <Button type="submit" disabled={submitting}>
+                      <Button
+                        type="button"
+                        size="sm"
+                        disabled={submitting || !newComment.trim()}
+                        onClick={() => addComment()}
+                      >
                         Send
                       </Button>
-                    </form>
-                    <div className="flex items-center gap-2">
                       <VoiceRecorder
                         onRecorded={handleVoiceNote}
                         disabled={submitting}
                       />
                     </div>
+                    <p className="mt-1.5 text-center text-xs text-slate-400">
+                      Hold mic button to record voice note
+                    </p>
                   </CardContent>
                 )}
               </Card>

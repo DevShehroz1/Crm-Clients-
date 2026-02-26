@@ -88,33 +88,33 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
-      <header className="border-b border-slate-200/80 bg-white/80 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/80">
-        <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-6">
+    <div className="min-h-screen bg-slate-50">
+      <header className="border-b border-slate-200 bg-white">
+        <div className="mx-auto flex h-14 max-w-4xl items-center px-6">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 text-white dark:bg-slate-50 dark:text-slate-900">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-violet-600 text-white">
               <Users className="h-5 w-5" />
             </div>
             <div>
-              <h1 className="text-lg font-semibold text-slate-900 dark:text-slate-50">
+              <h1 className="text-base font-semibold text-slate-900">
                 Client CRM
               </h1>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Manage your clients and their tasks
+              <p className="text-xs text-slate-500">
+                Manage clients and tasks
               </p>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-5xl px-6 py-10">
-        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <main className="mx-auto max-w-4xl px-6 py-8">
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
+            <h2 className="text-xl font-semibold text-slate-900">
               Clients
             </h2>
-            <p className="mt-1 text-slate-500 dark:text-slate-400">
-              Add clients and share links for task assignment
+            <p className="mt-0.5 text-sm text-slate-500">
+              Add clients and share their task portal link
             </p>
           </div>
           <Button
@@ -131,20 +131,19 @@ export default function DashboardPage() {
             <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
           </div>
         ) : clients.length === 0 ? (
-          <Card className="border-dashed border-2 border-slate-200 dark:border-slate-700">
+          <Card className="border-dashed border-2 border-slate-200">
             <CardContent className="flex flex-col items-center justify-center py-16">
-              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
-                <Users className="h-8 w-8 text-slate-400" />
+              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-slate-100">
+                <Users className="h-7 w-7 text-slate-400" />
               </div>
-              <h3 className="text-lg font-medium text-slate-900 dark:text-slate-50">
+              <h3 className="text-base font-medium text-slate-900">
                 No clients yet
               </h3>
-              <p className="mt-1 text-center text-sm text-slate-500 dark:text-slate-400">
-                Add your first client to get started. Share their unique link so
-                they can assign tasks.
+              <p className="mt-1 text-center text-sm text-slate-500">
+                Add your first client and share their link for task assignment.
               </p>
               <Button
-                className="mt-6 gap-2"
+                className="mt-5 gap-2"
                 onClick={() => setAddOpen(true)}
               >
                 <Plus className="h-4 w-4" />
@@ -157,13 +156,13 @@ export default function DashboardPage() {
         {addOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center">
             <div
-              className="absolute inset-0 bg-black/50"
+              className="absolute inset-0 bg-black/40"
               onClick={() => setAddOpen(false)}
               aria-hidden
             />
-            <div className="relative z-10 w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl dark:border-slate-800 dark:bg-slate-900">
+            <div className="relative z-10 w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 shadow-xl">
               <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-lg font-semibold">Add New Client</h3>
+                <h3 className="text-base font-semibold text-slate-900">Add New Client</h3>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -175,7 +174,7 @@ export default function DashboardPage() {
               </div>
               <form onSubmit={handleAddClient} className="space-y-4">
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  <label className="mb-1.5 block text-sm font-medium text-slate-700">
                     Name *
                   </label>
                   <Input
@@ -186,7 +185,7 @@ export default function DashboardPage() {
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  <label className="mb-1.5 block text-sm font-medium text-slate-700">
                     Email
                   </label>
                   <Input
@@ -197,7 +196,7 @@ export default function DashboardPage() {
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  <label className="mb-1.5 block text-sm font-medium text-slate-700">
                     Company
                   </label>
                   <Input
@@ -222,19 +221,19 @@ export default function DashboardPage() {
         )}
 
         {clients.length > 0 ? (
-          <div className="grid gap-6 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2">
             {clients.map((client) => (
               <Card
                 key={client.id}
-                className="overflow-hidden transition-shadow hover:shadow-md"
+                className="overflow-hidden border-slate-200 transition-shadow hover:shadow-md"
               >
                 <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
                   <div>
-                    <CardTitle className="text-base font-semibold">
+                    <CardTitle className="text-base font-semibold text-slate-900">
                       {client.name}
                     </CardTitle>
                     {client.company && (
-                      <p className="text-sm text-slate-500 dark:text-slate-400">
+                      <p className="text-sm text-slate-500">
                         {client.company}
                       </p>
                     )}
@@ -252,7 +251,7 @@ export default function DashboardPage() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 text-red-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950"
+                      className="h-8 w-8 text-red-500 hover:bg-red-50 hover:text-red-600"
                       onClick={() => handleDeleteClient(client.id)}
                     >
                       <Trash2 className="h-4 w-4" />
@@ -260,7 +259,7 @@ export default function DashboardPage() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                  <div className="flex items-center gap-2 text-sm text-slate-600">
                     <ClipboardList className="h-4 w-4" />
                     <span>
                       {client.tasks.length} task

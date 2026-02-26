@@ -1,290 +1,168 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
+  Check,
+  Zap,
   Users,
-  Plus,
-  Trash2,
-  ExternalLink,
-  ClipboardList,
-  Loader2,
-  X,
+  MessageSquare,
+  BarChart3,
+  FolderKanban,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 
-type Client = {
-  id: string;
-  name: string;
-  email: string | null;
-  company: string | null;
-  slug: string;
-  tasks: { id: string; title: string; status: string }[];
-};
-
-export default function DashboardPage() {
-  const [clients, setClients] = useState<Client[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [addOpen, setAddOpen] = useState(false);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [company, setCompany] = useState("");
-
-  const fetchClients = async () => {
-    try {
-      const res = await fetch("/api/clients");
-      if (res.ok) {
-        const data = await res.json();
-        setClients(data);
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchClients();
-  }, []);
-
-  const handleAddClient = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim()) return;
-    try {
-      const res = await fetch("/api/clients", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name.trim(), email: email.trim() || undefined, company: company.trim() || undefined }),
-      });
-      if (res.ok) {
-        await fetchClients();
-        setName("");
-        setEmail("");
-        setCompany("");
-        setAddOpen(false);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleDeleteClient = async (id: string) => {
-    if (!confirm("Delete this client? All their tasks will be removed.")) return;
-    try {
-      const res = await fetch(`/api/clients/${id}`, { method: "DELETE" });
-      if (res.ok) await fetchClients();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const copyClientLink = (slug: string) => {
-    const url = `${typeof window !== "undefined" ? window.location.origin : ""}/client/${slug}`;
-    navigator.clipboard.writeText(url);
-    alert("Client link copied to clipboard!");
-  };
-
+export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex h-14 max-w-4xl items-center px-6">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-violet-600 text-white">
-              <Users className="h-5 w-5" />
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <header className="fixed left-0 right-0 top-0 z-50 border-b border-slate-200/80 bg-white/90 backdrop-blur-md">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-violet-600 text-white font-bold">
+              F
             </div>
-            <div>
-              <h1 className="text-base font-semibold text-slate-900">
-                Client CRM
-              </h1>
-              <p className="text-xs text-slate-500">
-                Manage clients and tasks
-              </p>
-            </div>
-          </div>
+            <span className="text-xl font-bold text-slate-900">Flux CRM</span>
+          </Link>
+          <nav className="hidden items-center gap-8 md:flex">
+            <a href="#features" className="text-sm font-medium text-slate-600 hover:text-slate-900">
+              Features
+            </a>
+            <a href="#benefits" className="text-sm font-medium text-slate-600 hover:text-slate-900">
+              Benefits
+            </a>
+            <Link href="/get-started">
+              <Button>Get Started</Button>
+            </Link>
+          </nav>
         </div>
       </header>
 
-      <main className="mx-auto max-w-4xl px-6 py-8">
-        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="text-xl font-semibold text-slate-900">
-              Clients
-            </h2>
-            <p className="mt-0.5 text-sm text-slate-500">
-              Add clients and share their task portal link
-            </p>
-          </div>
-          <Button
-            className="gap-2"
-            onClick={() => setAddOpen(true)}
-          >
-            <Plus className="h-4 w-4" />
-            Add Client
-          </Button>
-        </div>
-
-        {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
-          </div>
-        ) : clients.length === 0 ? (
-          <Card className="border-dashed border-2 border-slate-200">
-            <CardContent className="flex flex-col items-center justify-center py-16">
-              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-slate-100">
-                <Users className="h-7 w-7 text-slate-400" />
-              </div>
-              <h3 className="text-base font-medium text-slate-900">
-                No clients yet
-              </h3>
-              <p className="mt-1 text-center text-sm text-slate-500">
-                Add your first client and share their link for task assignment.
-              </p>
-              <Button
-                className="mt-5 gap-2"
-                onClick={() => setAddOpen(true)}
-              >
-                <Plus className="h-4 w-4" />
-                Add Client
+      {/* Hero */}
+      <section className="pt-32 pb-20 md:pt-40 md:pb-28">
+        <div className="mx-auto max-w-4xl px-6 text-center">
+          <h1 className="text-4xl font-bold tracking-tight text-slate-900 md:text-5xl lg:text-6xl">
+            Work management that
+            <span className="bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent"> flows</span>
+          </h1>
+          <p className="mt-6 text-lg text-slate-600 md:text-xl">
+            Flux CRM brings your team together. Manage tasks, communicate in channels,
+            and track progress — all in one place. Like Asana and ClickUp, built for modern teams.
+          </p>
+          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <Link href="/get-started">
+              <Button size="lg" className="gap-2 text-base px-8 py-6">
+                Create your own team
+                <Zap className="h-5 w-5" />
               </Button>
-            </CardContent>
-          </Card>
-        ) : null}
+            </Link>
+            <Link href="/app">
+              <Button variant="outline" size="lg" className="text-base px-8 py-6">
+                Open workspace
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
 
-        {addOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center">
-            <div
-              className="absolute inset-0 bg-black/40"
-              onClick={() => setAddOpen(false)}
-              aria-hidden
-            />
-            <div className="relative z-10 w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 shadow-xl">
-              <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-base font-semibold text-slate-900">Add New Client</h3>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setAddOpen(false)}
-                  className="h-8 w-8"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
+      {/* Features */}
+      <section id="features" className="border-t border-slate-200 bg-slate-50 py-20">
+        <div className="mx-auto max-w-6xl px-6">
+          <h2 className="text-center text-3xl font-bold text-slate-900">
+            Everything you need to get work done
+          </h2>
+          <p className="mx-auto mt-4 max-w-2xl text-center text-slate-600">
+            Tasks, channels, file uploads, and more — all designed for seamless collaboration.
+          </p>
+          <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-violet-100 text-violet-600">
+                <BarChart3 className="h-6 w-6" />
               </div>
-              <form onSubmit={handleAddClient} className="space-y-4">
-                <div>
-                  <label className="mb-1.5 block text-sm font-medium text-slate-700">
-                    Name *
-                  </label>
-                  <Input
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Client name"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-sm font-medium text-slate-700">
-                    Email
-                  </label>
-                  <Input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="client@example.com"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-sm font-medium text-slate-700">
-                    Company
-                  </label>
-                  <Input
-                    value={company}
-                    onChange={(e) => setCompany(e.target.value)}
-                    placeholder="Company name"
-                  />
-                </div>
-                <div className="flex gap-2 pt-2">
-                  <Button type="submit">Add Client</Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setAddOpen(false)}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </form>
+              <h3 className="mt-4 font-semibold text-slate-900">Tasks & Lists</h3>
+              <p className="mt-2 text-sm text-slate-600">
+                Create tasks, assign owners, set due dates. Track progress with statuses like In Progress, In Review, On Hold.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-100 text-indigo-600">
+                <MessageSquare className="h-6 w-6" />
+              </div>
+              <h3 className="mt-4 font-semibold text-slate-900">Channels</h3>
+              <p className="mt-2 text-sm text-slate-600">
+                Internal communication channels for your team. Discuss projects, share updates, and stay in sync.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-100 text-amber-600">
+                <Users className="h-6 w-6" />
+              </div>
+              <h3 className="mt-4 font-semibold text-slate-900">Teams</h3>
+              <p className="mt-2 text-sm text-slate-600">
+                Invite team members, assign tasks, and collaborate. Everyone knows who&apos;s doing what.
+              </p>
             </div>
           </div>
-        )}
+        </div>
+      </section>
 
-        {clients.length > 0 ? (
-          <div className="grid gap-4 sm:grid-cols-2">
-            {clients.map((client) => (
-              <Card
-                key={client.id}
-                className="overflow-hidden border-slate-200 transition-shadow hover:shadow-md"
-              >
-                <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
-                  <div>
-                    <CardTitle className="text-base font-semibold text-slate-900">
-                      {client.name}
-                    </CardTitle>
-                    {client.company && (
-                      <p className="text-sm text-slate-500">
-                        {client.company}
-                      </p>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Link href={`/client/${client.slug}`} target="_blank">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-slate-500 hover:text-slate-700"
-                      >
-                        <ExternalLink className="h-4 w-4" />
-                      </Button>
-                    </Link>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-red-500 hover:bg-red-50 hover:text-red-600"
-                      onClick={() => handleDeleteClient(client.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-center gap-2 text-sm text-slate-600">
-                    <ClipboardList className="h-4 w-4" />
-                    <span>
-                      {client.tasks.length} task
-                      {client.tasks.length !== 1 ? "s" : ""}
-                    </span>
-                  </div>
-                  <div className="flex gap-2">
-                    <Link href={`/manage/${client.id}`} className="flex-1">
-                      <Button className="w-full gap-2">Manage Tasks</Button>
-                    </Link>
-                    <Button
-                      variant="outline"
-                      className="flex-1 gap-2"
-                      onClick={() => copyClientLink(client.slug)}
-                    >
-                      Copy Link
-                      <ExternalLink className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+      {/* Benefits */}
+      <section id="benefits" className="py-20">
+        <div className="mx-auto max-w-6xl px-6">
+          <h2 className="text-center text-3xl font-bold text-slate-900">
+            Why Flux CRM?
+          </h2>
+          <div className="mt-12 grid gap-6 md:grid-cols-2">
+            {[
+              "Track tasks with status: To Do, In Progress, In Review, Done",
+              "Assign tasks to team members",
+              "Upload files, images, and documents to tasks",
+              "Voice notes for quick updates",
+              "Channels for team communication",
+              "Progress bars and due dates",
+            ].map((benefit, i) => (
+              <div key={i} className="flex items-start gap-3">
+                <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                  <Check className="h-4 w-4" />
+                </div>
+                <span className="text-slate-700">{benefit}</span>
+              </div>
             ))}
           </div>
-        ) : null}
-      </main>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="border-t border-slate-200 bg-slate-50 py-20">
+        <div className="mx-auto max-w-3xl px-6 text-center">
+          <h2 className="text-3xl font-bold text-slate-900">
+            Ready to streamline your work?
+          </h2>
+          <p className="mt-4 text-slate-600">
+            Create your team, invite members, and start collaborating today.
+          </p>
+          <Link href="/get-started" className="mt-8 inline-block">
+            <Button size="lg" className="gap-2 px-10 py-6 text-base">
+              Create your own team
+              <FolderKanban className="h-5 w-5" />
+            </Button>
+          </Link>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-slate-200 py-8">
+        <div className="mx-auto max-w-6xl px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-600 text-white font-bold text-sm">
+              F
+            </div>
+            <span className="font-semibold text-slate-900">Flux CRM</span>
+          </div>
+          <p className="text-sm text-slate-500">
+            Work management for modern teams.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }

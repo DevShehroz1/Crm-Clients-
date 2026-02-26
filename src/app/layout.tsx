@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Client CRM | Manage Clients & Tasks",
-  description: "CRM for managing client tasks, comments, and voice notes",
+  title: "Flux CRM | Work Management for Teams",
+  description: "Work management tool for teams - tasks, channels, and collaboration",
 };
 
 export default function RootLayout({

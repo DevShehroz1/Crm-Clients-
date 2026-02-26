@@ -1,13 +1,12 @@
 // Prisma schema for CRM
-// For Vercel: use PostgreSQL (Vercel Postgres / Neon)
-// For local dev: use SQLite
+// PostgreSQL for Vercel (Neon) and local dev
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 

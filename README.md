@@ -40,22 +40,21 @@ A client-facing CRM similar to ClickUp: manage clients, assign tasks, add commen
 
 ### Deploy on Vercel
 
-1. **Database**
-   - SQLite is not supported on Vercel serverless.
-   - Use [Vercel Postgres](https://vercel.com/storage/postgres) or [Neon](https://neon.tech) and create a PostgreSQL database.
+1. **Database** – Use [Neon](https://neon.tech) and create a PostgreSQL database.
 
-2. **Update Prisma schema** for PostgreSQL:
-   - In `prisma/schema.prisma`, change:
-     - `provider = "sqlite"` → `provider = "postgresql"`
-   - Point `DATABASE_URL` to your Postgres connection string.
-
-3. **Vercel**
+2. **Vercel**
    - Connect your repo in [Vercel](https://vercel.com)
-   - Add `DATABASE_URL` in project settings (from Vercel Postgres or Neon)
-   - Deploy.
+   - Add `DATABASE_URL` in project settings (paste your Neon `POSTGRES_PRISMA_URL` value)
 
-4. **Client link**
-   - After deploy, use `https://your-app.vercel.app/client/[slug]` as the client portal link.
+3. **Run migrations** (one-time, to create tables in Neon):
+   ```bash
+   # In .env, set DATABASE_URL to your Neon connection string, then:
+   npm run db:migrate
+   ```
+
+4. **Deploy** – Push to GitHub; Vercel will auto-deploy.
+
+5. **Client link** – `https://your-app.vercel.app/client/[slug]`
 
 ## Tech stack
 
